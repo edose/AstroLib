@@ -13,17 +13,11 @@ namespace AstroLib.ImportsTests2;
 [TestFixture]
 [SuppressMessage("Assertion", "NUnit2045:Use Assert.Multiple")]
 public class SofaTests {
-    private static double DegreesAsRadians(double deg) {
-        return deg * (Math.PI / 180.0);
-    }
+    private static double DegreesAsRadians(double deg) { return deg * (Math.PI / 180.0); }
 
-    private static double HoursAsRadians(double hours) {
-        return (hours * 15.0) * (Math.PI / 180.0);
-    }
+    private static double HoursAsRadians(double hours) { return (hours * 15.0) * (Math.PI / 180.0); }
 
-    private static double RadiansAsDegrees(double radians) {
-        return radians * (180.0 / Math.PI);
-    }
+    private static double RadiansAsDegrees(double radians) { return radians * (180.0 / Math.PI); }
 
     private const double ra_yy_gem = 7.5770553; // hours
     private const double dec_yy_gem = 31.86944; // degrees
@@ -512,15 +506,16 @@ public class SofaTests {
         Assert.That(raAfter, Is.EqualTo(1.983_676_1).Within(0.000_000_1));
         Assert.That(decAfter, Is.EqualTo(0.556_211_4).Within(0.000_000_1));
 
-        // Verify exception is thrown whenever Pmsafe() should be used instead:
+        // Verify that exception is thrown whenever Pmsafe() should be used instead:
         var ex = Assert.Throws<ArgumentException>(() => {
             Sofa.Starpm(raBefore, decBefore, pmr1, pmd1, 0.0, 0.0,
                 ep1a, ep1b, ep2a, ep2b);
         });
-        StringAssert.Contains("Use Sofa.Pmsafe()", ex.Message.ToString());
+        Assert.That(ex, Is.Not.Null);
+        StringAssert.Contains("Use Sofa.Pmsafe()", ex?.Message);
     }
 
-    #endregion
+#endregion
 
 #region "Astronomy/EclipticCoordinates"
 
