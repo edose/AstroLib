@@ -12,6 +12,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{60A36F5E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportsTests", "tests\ImportsTests\ImportsTests.csproj", "{2DF5E63A-7CB6-4C2B-9F89-D3CFB5FD52F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeometryTests", "tests\GeometryTests\GeometryTests.csproj", "{FFAABC64-D643-40A5-9C71-ADCBC1B51142}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doxygen", "doxygen", "{608B9B36-742F-4C04-87D6-A55473D71B7D}"
+	ProjectSection(SolutionItems) = preProject
+		Doxygen\AstroLib_Logo.png = Doxygen\AstroLib_Logo.png
+		Doxygen\AstroLib_Logo.psd = Doxygen\AstroLib_Logo.psd
+		Doxygen\Doxyfile = Doxygen\Doxyfile
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,11 +43,16 @@ Global
 		{2DF5E63A-7CB6-4C2B-9F89-D3CFB5FD52F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DF5E63A-7CB6-4C2B-9F89-D3CFB5FD52F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DF5E63A-7CB6-4C2B-9F89-D3CFB5FD52F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFAABC64-D643-40A5-9C71-ADCBC1B51142}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFAABC64-D643-40A5-9C71-ADCBC1B51142}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFAABC64-D643-40A5-9C71-ADCBC1B51142}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFAABC64-D643-40A5-9C71-ADCBC1B51142}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{81CB6EFC-0E74-46A4-A75F-0A5E1872984B} = {DB35B9D6-34F0-410E-8BC1-E67E9CFD6A80}
 		{696F078C-D91C-40DD-8BFB-02DB24388D0B} = {DB35B9D6-34F0-410E-8BC1-E67E9CFD6A80}
 		{A7D4E68A-A50A-4FB0-A4AF-D3237574AD64} = {DB35B9D6-34F0-410E-8BC1-E67E9CFD6A80}
 		{2DF5E63A-7CB6-4C2B-9F89-D3CFB5FD52F7} = {60A36F5E-D1E7-429A-8CE7-76CA27E271A2}
+		{FFAABC64-D643-40A5-9C71-ADCBC1B51142} = {60A36F5E-D1E7-429A-8CE7-76CA27E271A2}
 	EndGlobalSection
 EndGlobal
