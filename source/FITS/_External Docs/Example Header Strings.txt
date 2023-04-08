@@ -1,0 +1,125 @@
+SIMPLE  =                    T
+BITPIX  =                   16 /8 unsigned int, 16 & 32 int, -32 & -64 real
+NAXIS   =                    2 /number of axes
+NAXIS1  =                 3072 /fastest changing axis
+NAXIS2  =                 2047 /next to fastest changing axis
+BSCALE  =   1.0000000000000000 /physical = BZERO + BSCALE*array_value
+BZERO   =   32768.000000000000 /physical = BZERO + BSCALE*array_value
+DATE-OBS= '2023-02-03T04:33:56.520' / [ISO 8601] UTC date/time of exposure start
+EXPTIME =   3.30000000000E+002 / [sec] Duration of exposure
+EXPOSURE=   3.30000000000E+002 / [sec] Duration of exposure
+SET-TEMP=  -35.000000000000000 /CCD temperature setpoint in C
+CCD-TEMP=  -35.000000000000000 /CCD temperature at start of exposure in C
+XPIXSZ  =   9.0000000000000000 /Pixel Width in microns (after binning)
+YPIXSZ  =   9.0000000000000000 /Pixel Height in microns (after binning)
+XBINNING=                    1 / Binning level along the X-axis
+YBINNING=                    1 / Binning level along the Y-axis
+XORGSUBF=                    0 /Subframe X position in binned pixels
+YORGSUBF=                    0 /Subframe Y position in binned pixels
+READOUTM= 'Raw     ' /          Readout mode of image
+FILTER  = 'BB      '           / Filter name
+IMAGETYP= 'Light Frame' /       Type of image
+TRAKTIME=   1.5199996232986450 /Exposure time used for autoguiding
+FOCALLEN=               2704.5 / Focal length of telescope in mm
+APTDIA  =   350.00000000000000 /Aperture diameter of telescope in mm
+APTAREA =   84425.396176055074 /Aperture area of telescope in mm^2
+EGAIN   =   1.5699999332427979 /Electronic gain in e-/ADU
+SBSTDVER= 'SBFITSEXT Version 1.0' /Version of SBFITSEXT standard in effect
+SWCREATE= 'MaxIm DL Version 6.27 221012 2K189' /Name of software
+SWSERIAL= '293Y0-UVQ1P-K0306-FCFKX-115C2-88' /Software serial number
+SITELAT = '32 54 11' /          Latitude of the imaging location
+SITELONG= '-105 31 44' /        Longitude of the imaging location
+JD      =   2459978.6902374998 /Julian Date at time of exposure
+JD-HELIO=   2459978.6882105479 /Heliocentric Julian Date at time of exposure
+OBJECT  = 'MP_1639 '           / Target object name
+TELESCOP= 'ACP->PlaneWave Interface 4 (PWI4)' / Telescope name
+INSTRUME= 'SBIG STXL-6303 3 CCD Camera' / Detector instrument name
+OBSERVER= 'e       '           / Observer name
+NOTES   = '        '
+ROWORDER= 'TOP-DOWN' /          Image write order, BOTTOM-UP or TOP-DOWN
+FLIPSTAT= '        '
+CSTRETCH= 'Medium  ' /          Initial display stretch mode
+CBLACK  =                 2829 /Initial display black level in ADUs
+CWHITE  =                 3878 /Initial display white level in ADUs
+PEDESTAL=                 -100 /Correction to add for zero-based ADU
+SWOWNER = 'Eric Dose' /         Licensed owner of software
+JD-OBS  =      2459978.6902375
+HJD-OBS =      2459978.6955914
+BJD-OBS =      2459978.6964403
+OBJCTAZ =              98.7560
+AZIMUTH =              98.7560
+OBJCTALT=              30.9953
+ALTITUDE=              30.9953
+OBJCTHA = '-03 57 09.54'
+HA      = '-03 57 09.54'
+READMODE= 'Raw     '
+HISTORY File was processed by PinPoint 6.1.3 at 2023-02-03T04:39:37
+DATE    = '03/02/23'           / [old format] UTC date of exposure start
+TIME-OBS= '04:33:56'           / [old format] UTC time of exposure start
+UT      = '04:33:56'           / [old format] UTC time of exposure start
+TIMESYS = 'UTC     '           / Default time system
+RADECSYS= 'FK5     '           / Equatorial coordinate system
+AIRMASS =   1.89047119231E+000 / Airmass (multiple of zenithal airmass)
+ST      = '06 24 14.84'        / Local apparent sidereal time of exp. start
+LAT-OBS =   3.29030555556E+001 / [deg +N WGS84] Geodetic latitude
+LONG-OBS=  -1.05528888889E+002 / [deg +E WGS84] Geodetic longitude
+ALT-OBS =   2.22800000000E+003 / [metres] Altitude above mean sea level
+OBSERVAT= 'BOREA C14 L-500 @ NSM, NM' / Observatory name
+RA      = '10 21 24.38'        / [hms J2000] Target right ascension
+OBJCTRA = '10 21 24.38'        / [hms J2000] Target right ascension
+DEC     = '+09 47 54.3'        / [dms +N J2000] Target declination
+OBJCTDEC= '+09 47 54.3'        / [dms +N J2000] Target declination
+HISTORY File was processed by PinPoint 6.1.3 at 2023-02-03T04:39:44
+FWHM    =   6.23583161831E+000 / [pixels] Mean Full-Width-Half-Max of image star
+ZMAG    =   2.09759617980E+001 / Mag zero point for 1 sec exposure
+EQUINOX =               2000.0 / Equatorial coordinates are J2000
+EPOCH   =               2000.0 / (incorrect but needed by old programs)
+PA      =   3.54032095586E+002 / [deg, 0-360 CCW] Position angle of plate
+CTYPE1  = 'RA---TAN'           / X-axis coordinate type
+CRVAL1  =   1.55360310358E+002 / X-axis coordinate value
+CRPIX1  =   1.53600000000E+003 / X-axis reference pixel
+CDELT1  =  -1.90421389272E-004 / [deg/pixel] X-axis plate scale
+CROTA1  =   5.96790441404E+000 / [deg] Roll angle wrt X-axis
+CTYPE2  = 'DEC--TAN'           / Y-axis coordinate type
+CRVAL2  =   9.79350005748E+000 / Y-axis coordinate value
+CRPIX2  =   1.02350000000E+003 / Y-axis reference pixel
+CDELT2  =  -1.90551761813E-004 / [deg/pixel] Y-Axis Plate scale
+CROTA2  =   5.96790441404E+000 / [deg] Roll angle wrt Y-axis
+CD1_1   =  -1.89389361215E-004 / Change in RA---TAN along X-Axis
+CD1_2   =   1.98119223840E-005 / Change in RA---TAN along Y-Axis
+CD2_1   =  -1.97983673759E-005 / Change in DEC--TAN along X-Axis
+CD2_2   =  -1.89519027175E-004 / Change in DEC--TAN along Y-Axis
+TR1_0   =   1.53599853833E+003 / [private] X-axis distortion coefficients
+TR1_1   =   3.07199853876E+003
+TR1_2   =  -2.99076457852E+000
+TR1_3   =   5.71711522768E+000
+TR1_4   =  -2.80523183155E-001
+TR1_5   =  -1.72348106656E+000
+TR1_6   =  -5.46464196682E+001
+TR1_7   =   1.01796122917E+001
+TR1_8   =  -2.62740914305E+001
+TR1_9   =   1.45176760703E+001
+TR2_0   =   1.02349999846E+003 / [private] Y-axis distortion coefficients
+TR2_1   =  -2.76842068652E-003
+TR2_2   =   2.04700000809E+003
+TR2_3   =   1.97627533521E+000
+TR2_4   =   2.99687565910E+000
+TR2_5   =  -1.90065148384E-001
+TR2_6   =   1.47030028090E+000
+TR2_7   =  -5.69162607349E+001
+TR2_8   =  -6.04155667047E+000
+TR2_9   =  -2.10138691535E+001
+HISTORY WCS added by PinPoint 6.1.3 at 2023-02-03T04:39:44
+HISTORY   Matched 37 stars from the Gray GSC-ACT Catalog
+HISTORY   Average residual was 0.30 arc-seconds
+PLTSOLVD=                    T / Plate has been solved by PinPoint
+INPUTFMT= 'FITS    ' /          Format of file from which image was read
+SWMODIFY= 'MaxIm DL Version 6.20 201010 293Y0' /Name of software
+HISTORY  Bias Subtraction (Bias 1, 3072 x 2047, Bin1 x 1, Temp -35C,
+HISTORY  Exp Time 0ms)
+CALSTAT = 'BDF     '
+HISTORY  Dark Subtraction (Dark 3, 3072 x 2047, Bin1 x 1, Temp -35C,
+HISTORY  Exp Time 240s)
+HISTORY  Flat Field (Flat BB 1, BB, 3072 x 2047, Bin1 x 1, Temp -35C,
+HISTORY  Exp Time 2s)
+END
