@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using AstroLib.Imports.Sofa;
+using AstroLib.Core.SOFA;
 using NUnit.Framework;
+
 // ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
@@ -8,7 +9,7 @@ using NUnit.Framework;
 // ReSharper disable InlineTemporaryVariable
 // ReSharper disable JoinDeclarationAndInitializer
 
-namespace AstroLib.ImportsTests2;
+namespace AstroLibTests.SofaTests;
 
 [TestFixture]
 [SuppressMessage("Assertion", "NUnit2045:Use Assert.Multiple")]

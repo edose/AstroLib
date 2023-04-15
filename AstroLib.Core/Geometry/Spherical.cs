@@ -1,4 +1,4 @@
-namespace AstroLib.Geometry; 
+namespace AstroLib.Core.Geometry; 
 
 public static class Spherical {
     /// <summary>Returns list of spherical coordinates evenly spaced on a sphere.</summary>

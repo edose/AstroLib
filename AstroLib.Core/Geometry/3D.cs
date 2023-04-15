@@ -1,6 +1,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
-namespace AstroLib.Geometry; 
+
+namespace AstroLib.Core.Geometry; 
 
 /// <summary>Represents a point in three-dimensional space.</summary>
 public record Point3D {

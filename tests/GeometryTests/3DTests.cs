@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using AstroLib.Geometry;
+using AstroLib.Core.Geometry;
 using NUnit.Framework;
 
 // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -9,7 +9,7 @@ using NUnit.Framework;
 // ReSharper disable InlineTemporaryVariable
 // ReSharper disable JoinDeclarationAndInitializer
 
-namespace AstroCS.GeometryTests; 
+namespace AstroLibTests.GeometryTests;
 
 [TestFixture]
 [SuppressMessage("Assertion", "NUnit2045:Use Assert.Multiple")]

@@ -1,12 +1,8 @@
 ﻿// ReSharper disable MemberCanBePrivate.Global
 
-using System.Data;
-using System.Net.Mail;
-using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
-namespace AstroLib.Geometry;
+namespace AstroLib.Core.Geometry;
 
 /// <summary>Represents one (x,y) point on two-dimensional flat surface.</summary>
 public record Point2D {
@@ -34,6 +30,9 @@ public record Point2D {
         return new Point2D {X = this.X + dxy.Dx, Y = this.Y + dxy.Dy};
     }
 
+    /// <summary>Conceptual alias for .Add(). </summary>
+    public Point2D DisplaceBy(Vector2D dxy) { return this.Add(dxy); }
+
     /// <summary> Return a new vector from this point to other point. </summary>
     public Vector2D VectorTo(Point2D other) {
         return new Vector2D(this, other);
@@ -47,8 +46,7 @@ public record Point2D {
     /// <summary> Return distance from this point to a line defined by two points.</summary>
     public double DistanceToLine(Point2D a, Point2D b) {
         var distAb = new Vector2D(a, b).Length;
-        var distToLine = Math.Abs((b.X - a.X) * (a.Y - this.Y) - (b.Y - a.Y) * (a.X - this.X)) / distAb;
-        return distToLine;
+        return Math.Abs((b.X - a.X) * (a.Y - this.Y) - (b.Y - a.Y) * (a.X - this.X)) / distAb;
     }
 }
 

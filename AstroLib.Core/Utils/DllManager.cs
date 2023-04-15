@@ -1,5 +1,6 @@
-namespace AstroLib.Imports; 
 using System.Runtime.InteropServices;
+
+namespace AstroLib.Core.Utils; 
 
 public static class DllManager {
 

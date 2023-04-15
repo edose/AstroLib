@@ -1,10 +1,12 @@
 using System.Runtime.InteropServices;
+using AstroLib.Core.Utils;
+
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 
-namespace AstroLib.Imports.Sofa;
+namespace AstroLib.Core.SOFA;
 
 /*########################################################################################################*/
 // Due diligence statement from the author of this class and its resulting assembly (.dll file):
