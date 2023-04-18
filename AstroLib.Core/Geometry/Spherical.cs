@@ -21,16 +21,14 @@ public static class Spherical {
 ///     If Radius is given: a vector from the origin, locating a point in space.
 ///     If Radius is omitted or null: Direction-only coordinates (could be considered at infinite distance).
 /// </summary>
-public record SphCoord {
+public class SphCoord {
     
     public double Azimuth { get; init; }
     public double PolarAngle { get; init; }
     public double? Radius { get; init; } // Nullable.
 
-    // TODO: Ensure Azimuth is in [0, 2*pi) and PolarAngle is in [0, pi]. >>> but HOW????? <<< 
-    /// <summary>Default constructor, usage:
-    ///     sc = new SphCoord {Azimuth=az, PolarAngle=pa, Radius=r};</summary>
-    public SphCoord() {}
+    /// <summary>Private default constructor, to prevent user construction without input data.</summary>
+    private SphCoord() {}
 
     /// <summary>Constructor from 2 or 3 (with radius) doubles.</summary>
     /// <param name="azimuth">In radians, within [0, 2*pi).</param>
@@ -54,10 +52,4 @@ public record SphCoord {
         PolarAngle = Math.Acos(vector.Dz / radius); // Cannot use property Radius here (it's nullable).
         Radius = radius;
     }
-    
-    
-
 }
-
-
-

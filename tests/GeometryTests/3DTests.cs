@@ -25,11 +25,11 @@ public class Point3DTests {
 
     [Test]
     public void Constructor_Tests() {
-        // Default constructor:
-        var pt1 = new Point3D {X = 33, Y = 44, Z = 56};
-        Assert.That(pt1.X, Is.EqualTo(33.0));
-        Assert.That(pt1.Y, Is.EqualTo(44.0));
-        Assert.That(pt1.Z, Is.EqualTo(56.0));
+        // // Default constructor:
+        // var pt1 = new Point3D {X = 33, Y = 44, Z = 56};
+        // Assert.That(pt1.X, Is.EqualTo(33.0));
+        // Assert.That(pt1.Y, Is.EqualTo(44.0));
+        // Assert.That(pt1.Z, Is.EqualTo(56.0));
         
         // From doubles:
         var pt2 = new Point3D(34, 45, 73);
@@ -92,11 +92,11 @@ public class Vector3DTests {
 
     [Test]
     public void Constructor_Tests() {
-        // Default constructor:
-        var vector1 = new Vector3D {Dx = 33, Dy = 44, Dz = 51};
-        Assert.That(vector1.Dx, Is.EqualTo(33.0));
-        Assert.That(vector1.Dy, Is.EqualTo(44.0));
-        Assert.That(vector1.Dz, Is.EqualTo(51.0));
+        // // Default constructor:
+        // var vector1 = new Vector3D {Dx = 33, Dy = 44, Dz = 51};
+        // Assert.That(vector1.Dx, Is.EqualTo(33.0));
+        // Assert.That(vector1.Dy, Is.EqualTo(44.0));
+        // Assert.That(vector1.Dz, Is.EqualTo(51.0));
 
         // From doubles:
         var vector2 = new Vector3D(34, 22, 13);

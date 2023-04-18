@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
-using AstroLib.Core.Geometry;
 using NUnit.Framework;
-
+using AstroLib.Core.Geometry;
 
 // ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable CommentTypo
@@ -26,12 +25,12 @@ public class Point2DTests {
     
     [Test]
     public void Constructor_Tests() {
-        // Default constructor:
-        var pt1 = new Point2D {X = 33, Y = 44};
-        Assert.That(pt1.X, Is.EqualTo(33.0));
-        Assert.That(pt1.Y, Is.EqualTo(44.0));
+        // // Default constructor:
+        // var pt1 = new Point2D {X = 33, Y = 44};
+        // Assert.That(pt1.X, Is.EqualTo(33.0));
+        // Assert.That(pt1.Y, Is.EqualTo(44.0));
         
-        // From doubles:
+        // From 2 doubles:
         var pt2 = new Point2D(34, 45);
         Assert.That(pt2.X, Is.EqualTo(34.0));
         Assert.That(pt2.Y, Is.EqualTo(45.0));
@@ -75,6 +74,7 @@ public class Point2DTests {
         
         // Test consistency on reversal:
         Assert.That(p1.VectorTo(p2), Is.EqualTo(p2.VectorFrom(p1)));
+        Assert.That(p1.VectorTo(p2), Is.EqualTo(p2.VectorTo(p1).Reversed));
         
         // .DistanceToLine(point, point) where points define the line:
         var linePointA = new Point2D(0, 3);
@@ -102,10 +102,10 @@ public class Vector2DTests {
 
     [Test]
     public void Constructor_Tests() {
-        // Default constructor:
-        var vector1 = new Vector2D {Dx = 33, Dy = 44};
-        Assert.That(vector1.Dx, Is.EqualTo(33.0));
-        Assert.That(vector1.Dy, Is.EqualTo(44.0));
+        // // Default constructor:
+        // var vector1 = new Vector2D {Dx = 33, Dy = 44};
+        // Assert.That(vector1.Dx, Is.EqualTo(33.0));
+        // Assert.That(vector1.Dy, Is.EqualTo(44.0));
         
         // From doubles:
         var vector2 = new Vector2D(34, 22);

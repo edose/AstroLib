@@ -49,14 +49,14 @@ public class SphCoordTests {
     [Test]
     public void Constructor_Tests() {
         // Default constructor:
-        var sc1 = new SphCoord() {Azimuth = 1.3, PolarAngle = 1.4, Radius = 5.0};
-        Assert.That(sc1.Azimuth, Is.EqualTo(1.3));
-        Assert.That(sc1.PolarAngle, Is.EqualTo(1.4));
-        Assert.That(sc1.Radius, Is.EqualTo(5.0));
-        var sc2 = new SphCoord() {Azimuth = 2.3, PolarAngle = 2.4, Radius = null};
-        Assert.That(sc2.Azimuth, Is.EqualTo(2.3));
-        Assert.That(sc2.PolarAngle, Is.EqualTo(2.4));
-        Assert.That(sc2.Radius, Is.Null);
+        // var sc1 = new SphCoord() {Azimuth = 1.3, PolarAngle = 1.4, Radius = 5.0};
+        // Assert.That(sc1.Azimuth, Is.EqualTo(1.3));
+        // Assert.That(sc1.PolarAngle, Is.EqualTo(1.4));
+        // Assert.That(sc1.Radius, Is.EqualTo(5.0));
+        // var sc2 = new SphCoord() {Azimuth = 2.3, PolarAngle = 2.4, Radius = null};
+        // Assert.That(sc2.Azimuth, Is.EqualTo(2.3));
+        // Assert.That(sc2.PolarAngle, Is.EqualTo(2.4));
+        // Assert.That(sc2.Radius, Is.Null);
 
         // Constructor from 2 or 3 (with radius) doubles:
         var sc3 = new SphCoord(3.3, 3.4, 5.5);
