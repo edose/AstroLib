@@ -51,10 +51,36 @@ public class Point2D : IEquatable<Point2D> {
         return new Vector2D(other, this);
     }
 
+    /// <summary>Return distance from this point to another point.</summary>
+    public double DistanceTo(Point2D other) {
+        return Math.Sqrt((X - other.X) * (X - other.X) + (Y - other.Y) * (Y - other.Y));
+    }
+
     /// <summary> Return distance from this point to a line defined by two points.</summary>
     public double DistanceToLine(Point2D a, Point2D b) {
         var distAb = new Vector2D(a, b).Length;
+        if (distAb == 0) {
+            return (new Vector2D(this, a)).Length;
+        }
         return Math.Abs((b.X - a.X) * (a.Y - Y) - (b.Y - a.Y) * (a.X - X)) / distAb;
+    }
+
+    /// <summary> Return distance from this point to a line *segment* defined by two points.</summary>
+    public double DistanceToSegment(Point2D a, Point2D b) {
+        var ax = new Vector2D(a, this);
+        var ab = new Vector2D(a, b);
+        var dpAxAb = ax.DotProduct(ab);
+        var bx = new Vector2D(b, this);
+        var ba = new Vector2D(b, a);
+        var dpBxBa = bx.DotProduct(ba);
+        
+        // If point a and point b are directly on, or are on the the same side of the normal
+        // from this point to the line:
+        if (Math.Sign(dpAxAb) == Math.Sign(dpBxBa)) {
+            return Math.Min(ax.Length, bx.Length);
+        }        
+        // Point a and point must be on opposite sides of the normal from this point to the line:
+        return this.DistanceToLine(a, b);
     }
 }
 

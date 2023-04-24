@@ -61,30 +61,63 @@ public class Point2DTests {
         pResult = p1.Add(v1);
         Assert.That(pResult.X, Is.EqualTo(p1.X + v1.Dx));
         Assert.That(pResult.Y, Is.EqualTo(p1.Y + v1.Dy));
-        
+
         // .VectorTo(point):
         vResult = p1.VectorTo(p3);
         Assert.That(vResult.Dx, Is.EqualTo(p3.X - p1.X));
         Assert.That(vResult.Dy, Is.EqualTo(p3.Y - p1.Y));
-        
+
         // .VectorFrom(point):
         vResult = p1.VectorFrom(p3);
         Assert.That(vResult.Dx, Is.EqualTo(p1.X - p3.X));
         Assert.That(vResult.Dy, Is.EqualTo(p1.Y - p3.Y));
-        
+
         // Test consistency on reversal:
         Assert.That(p1.VectorTo(p2), Is.EqualTo(p2.VectorFrom(p1)));
         Assert.That(p1.VectorTo(p2), Is.EqualTo(p2.VectorTo(p1).Reversed));
         
+        // .DistanceTo(point):
+        var ptA = new Point2D(1, 2);
+        var ptB = new Point2D(4, 3);
+        Assert.That(ptA.DistanceTo(ptA), Is.EqualTo(0));
+        Assert.That(ptA.DistanceTo(ptB), Is.EqualTo(Math.Sqrt(10.0)).Within(1E-9));
+        Assert.That(ptA.DistanceTo(ptB), Is.EqualTo(ptB.DistanceTo(ptA)));
+
         // .DistanceToLine(point, point) where points define the line:
         var linePointA = new Point2D(0, 3);
         var linePointB = new Point2D(4, 0);
         var point = new Point2D(4, 3);
         var distance = point.DistanceToLine(linePointA, linePointB);
         Assert.That(distance, Is.EqualTo(2.4).Within(1E-9));
-        
+
         var distanceLinePointsReversed = point.DistanceToLine(linePointB, linePointA);
         Assert.That(distance, Is.EqualTo(distanceLinePointsReversed).Within(1E-9));
+
+        // .DistanceToSegment(point, point) where points define the ends of the line segment.
+        // Case: A or B is on the normal:
+        linePointA = new Point2D(1, 3);
+        linePointB = new Point2D(1, 0);
+        point = new Point2D(4, 3);
+        distance = point.DistanceToSegment(linePointA, linePointB);
+        Assert.That(distance, Is.EqualTo(3).Within(1E-9));
+        
+        // Case: A and B are on opposite sides of the normal:
+        linePointA = new Point2D(1, 3);
+        linePointB = new Point2D(1, 0);
+        point = new Point2D(4, 2);
+        distance = point.DistanceToSegment(linePointA, linePointB);
+        var expected = point.VectorTo(linePointA).Length; 
+        Assert.That(distance, Is.EqualTo(expected).Within(1E-9));
+        Assert.That(distance, Is.LessThan(point.DistanceTo(linePointA)).Within(1E-9));
+        Assert.That(distance, Is.LessThan(point.DistanceTo(linePointB)).Within(1E-9));
+        
+        // Case: A and B are on same side of the normal:
+        linePointA = new Point2D(1, 3);
+        linePointB = new Point2D(1, 0);
+        point = new Point2D(4, 2);
+        distance = point.DistanceToSegment(linePointA, linePointB);
+        expected = point.VectorTo(linePointA).Length;
+        Assert.That(distance, Is.EqualTo(expected).Within(1E-9));
     }
 }
 

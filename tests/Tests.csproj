@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\AstroLib.Catalog\AstroLib.Catalog.csproj" />
       <ProjectReference Include="..\AstroLib.Core\AstroLib.Core.csproj" />
       <ProjectReference Include="..\AstroLib.IO\AstroLib.IO.csproj" />
     </ItemGroup>
