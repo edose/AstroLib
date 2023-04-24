@@ -1,5 +1,6 @@
 // ReSharper disable InconsistentNaming
 
+using System.Diagnostics;
 using AstroLib.Core;
 
 namespace AstroLib.Catalog.Atlas2; 
@@ -142,7 +143,20 @@ public class Atlas2Stars {
     /// Not for user access; users may access individual star objects via the class indexer.</summary>
     public List<Atlas2Star> Stars { get; private set; }
     
+    /// <summary>Indexer, pointing to i-th star (Atlas2Star object); mostly for testing.</summary>
+    /// <param name="i">Zero-based index.</param>
+    public Atlas2Star this[int i] => Stars[i];
+    
     public int Count => Stars.Count;
+    
+    public int NullCount => Stars.Where(star => star.OfDate == null).ToList().Count;
+
+    public bool AllDatesValid {
+        get {
+            if (Count <= 0 || NullCount >= 1) return false;
+            return Stars.All(star => star.OfDate == Stars[0].OfDate);
+        }
+    }
 
     /// <summary>Constructor most often used, from catalog and range of RA and Dec.</summary>
     /// <param name="catalog">An Atlas2Catalog object.</param>
@@ -235,10 +249,6 @@ public class Atlas2Stars {
     public Atlas2Stars(List<Atlas2Star> starList) {
         Stars = starList;
     }
-    
-    /// <summary>Indexer, pointing to i-th star (Atlas2Star object); mostly for testing.</summary>
-    /// <param name="i">Zero-based index.</param>
-    public Atlas2Star this[int i] => Stars[i];
 
     /// <summary>Add all stars from another Atlas2Stars object to this Atlas2Stars object.</summary>
     /// <param name="otherStars">Atlas2Stars object to add to this one.</param>
@@ -256,7 +266,7 @@ public class Atlas2Stars {
             star.UpdateRaDecForDate(yearsFromCatalogEpoch, date);
         }
     }
-    
+
     /// <summary>Remove all stars for which either the Variable flag or the Duplicate flag is set.</summary>
     /// <returns>Total count of stars remaining in newly screened object.</returns>
     public int RemoveAllFlagged() {

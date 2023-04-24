@@ -216,7 +216,44 @@ public class Atlas2StarsTests {
 
     [Test]
     public void Class_Property_Tests() {
-        // Properties (Count and indexer) were tested in Constructor_Tests() above.
+        // Properties Count and indexer were tested in Constructor_Tests() above.
+        
+        // .NullCount:
+        {
+            var stars = new Atlas2Stars(cat, 149, 71);
+            Assert.That(stars.NullCount, Is.EqualTo(stars.Count));
+            var dateA = new DateTime(2023, 4, 23, 0, 0, 0);
+            foreach (var star in stars.Stars) star.OfDate = dateA;
+            Assert.That(stars.NullCount, Is.Zero);
+            stars[2].OfDate = null;
+            Assert.That(stars.NullCount, Is.EqualTo(1));
+        }
+
+        // .AllDatesValid:
+        {
+            // Case: no stars in Atlas2Stars object:
+            var stars = new Atlas2Stars(new List<Atlas2Star>()); 
+            Assert.That(stars.AllDatesValid == false);
+            
+            // Case: absent (all null) OfDate values: 
+            stars = new Atlas2Stars(cat, 149, 71);
+            Assert.That(stars.Count, Is.EqualTo(872));
+            Assert.That(stars.AllDatesValid == false);
+            
+            // Case: a non-uniform OfDate value:
+            var dateA = new DateTime(2023, 4, 23, 0, 0, 0);
+            var dateB = new DateTime(2023, 4, 11, 11, 11, 11);
+            foreach (var star in stars.Stars) star.OfDate = dateA;
+            Assert.That(stars.AllDatesValid == true);
+            stars[1].OfDate = dateB;
+            Assert.That(stars.AllDatesValid == false);
+            
+            // Case: a null OfDate value: 
+            foreach (var star in stars.Stars) star.OfDate = dateA;
+            Assert.That(stars.AllDatesValid == true);
+            stars[2].OfDate = null;
+            Assert.That(stars.AllDatesValid == false);
+        }
     }
     
     [Test]
