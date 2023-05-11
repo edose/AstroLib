@@ -1,6 +1,5 @@
 // ReSharper disable InconsistentNaming
 
-using System.Diagnostics;
 using AstroLib.Core;
 
 namespace AstroLib.Catalog.Atlas2; 
@@ -18,13 +17,13 @@ public class Atlas2Star {
     public double DecGaia { get; init; }
     
     // POSITION DATA at user's date, as corrected for proper motion:
-    /// <summary>User date, for proper motion updating of RA and Declination from catalog epoch.</summary>
-    public DateTime? OfDate = null;
+    /// <summary>User date, for proper motion updating of RA and Declination from catalog epoch.
+    /// Null on first construction</summary>
+    public DateTime? OfDate { get; private set; } // public DateTime? OfDate = null;
     /// <summary>Right Ascension in degrees (J2000), at user date. Null on first construction.</summary>
-    public double? RaOfDate = null;
+    public double? RaOfDate { get; private set; } // public double? RaOfDate = null;
     /// <summary>Declination in degrees (J2000), at user date. Null on first construction.</summary>
-    public double? DecOfDate = null;
-    
+    public double? DecOfDate { get; private set; } // public double? DecOfDate = null;
     // PARALLAX DATA (estimate of distance to star in favorable cases):
     /// <summary>Parallax in arcseconds, Gaia DR2</summary>
     public double Parallax { get; init; }
@@ -127,7 +126,8 @@ public class Atlas2Star {
         OfDate = ofDate;
         var raOfDateRaw  = RaGaia  + (yearsFromCatalogEpoch * PM_Ra)  / 3600.0;
         RaOfDate  = AstroMath.EuclidianModulo(RaGaia, 360);
-        DecOfDate = DecGaia + (yearsFromCatalogEpoch * PM_Dec) / 3600.0; 
+        DecOfDate = AstroMath.Clamp(DecGaia + (yearsFromCatalogEpoch * PM_Dec) / 3600.0, 
+            -180, 180); 
     }
     
     public override string ToString() {

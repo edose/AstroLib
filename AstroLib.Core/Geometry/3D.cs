@@ -1,16 +1,15 @@
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
 
 using System.Diagnostics.CodeAnalysis;
 
 namespace AstroLib.Core.Geometry; 
 
 /// <summary>Represents a point in three-dimensional space.</summary>
-public class Point3D : IEquatable<Point3D> {
+public class Point3D {
     
-    public double X { get; init; }
-    public double Y { get; init; }
-    public double Z { get; init; }
+    public double X { get; private init; }
+    public double Y { get; private init; }
+    public double Z { get; private init; }
 
     /// <summary>Private default constructor, to prevent user construction without input data.</summary>
     private Point3D() {}
@@ -47,10 +46,10 @@ public class Point3D : IEquatable<Point3D> {
 }
 
 /// <summary>Represents a vector in three-dimensional space.</summary>
-public class Vector3D : IEquatable<Vector3D> {
-    public double Dx { get; init; }
-    public double Dy { get; init; }
-    public double Dz { get; init; }
+public class Vector3D {
+    public double Dx { get; private init; }
+    public double Dy { get; private init; }
+    public double Dz { get; private init; }
     public double Length2 => Dx * Dx + Dy * Dy + Dz * Dz;
     public double Length => Math.Sqrt(this.Length2);
     public Vector3D Reversed => new Vector3D(-Dx, -Dy, -Dz);
@@ -68,10 +67,10 @@ public class Vector3D : IEquatable<Vector3D> {
         Dz = to.Z - from.Z;
     }
 
-    /// <summary>Constructor from Tuple.</summary>
+    /// <summary>Constructor from Tuple of 3 doubles.</summary>
     public Vector3D(Tuple<double, double, double>dxyz) { (Dx, Dy, Dz) = dxyz; }
     
-    /// <summary>Constructor from array.</summary>
+    /// <summary>Constructor from array of 3 doubles.</summary>
     public Vector3D(double[] dxyz) { Dx = dxyz[0]; Dy = dxyz[1]; Dz = dxyz[2]; }
     
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]

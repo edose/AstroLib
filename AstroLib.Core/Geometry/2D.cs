@@ -5,10 +5,10 @@ using System.Diagnostics.CodeAnalysis;
 namespace AstroLib.Core.Geometry;
 
 /// <summary>Represents one (X,Y) point on a plane. X and Y are dimensionless.</summary>
-public class Point2D : IEquatable<Point2D> {
+public class Point2D {
     
-    public double X { get; init; }
-    public double Y { get; init; }
+    public double X { get; private init; }
+    public double Y { get; private init; }
 
     /// <summary>Private default constructor, to prevent user construction without input data.</summary>
     private Point2D() {}
@@ -17,14 +17,13 @@ public class Point2D : IEquatable<Point2D> {
     public Point2D(double x, double y) { X = x; Y = y; }
 
     /// <summary>Constructor from Tuple of 2 doubles.</summary>
-    public Point2D(Tuple<double, double>xy) { (X, Y) = xy; }
+    public Point2D(Tuple<double, double> xy) { (X, Y) = xy; }
     
     /// <summary>Constructor from Tuple of 2 ints.</summary>
     public Point2D(Tuple<int, int>xy) { (X, Y) = xy; }
 
     /// <summary>Constructor from array.</summary>
     public Point2D(double[] xy) { X = xy[0]; Y = xy[1]; }
-    
 
     /// <summary> Returns true iff other Point2D equals this one, exactly.</summary> 
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
@@ -59,13 +58,12 @@ public class Point2D : IEquatable<Point2D> {
     /// <summary> Return distance from this point to a line defined by two points.</summary>
     public double DistanceToLine(Point2D a, Point2D b) {
         var distAb = new Vector2D(a, b).Length;
-        if (distAb == 0) {
-            return (new Vector2D(this, a)).Length;
-        }
+        if (distAb == 0) { return (new Vector2D(this, a)).Length; }
         return Math.Abs((b.X - a.X) * (a.Y - Y) - (b.Y - a.Y) * (a.X - X)) / distAb;
     }
 
-    /// <summary> Return distance from this point to a line *segment* defined by two points.</summary>
+    /// <summary> Return shortest distance from this point to a line *segment* that is defined
+    /// by two points.</summary>
     public double DistanceToSegment(Point2D a, Point2D b) {
         var ax = new Vector2D(a, this);
         var ab = new Vector2D(a, b);
@@ -73,24 +71,28 @@ public class Point2D : IEquatable<Point2D> {
         var bx = new Vector2D(b, this);
         var ba = new Vector2D(b, a);
         var dpBxBa = bx.DotProduct(ba);
-        
         // If point a and point b are directly on, or are on the the same side of the normal
-        // from this point to the line:
-        if (Math.Sign(dpAxAb) == Math.Sign(dpBxBa)) {
-            return Math.Min(ax.Length, bx.Length);
-        }        
-        // Point a and point must be on opposite sides of the normal from this point to the line:
+        // from this point to the line, then the distance to the line segment is the distance
+        // to the nearer end of the segment:
+        if (Math.Sign(dpAxAb) == Math.Sign(dpBxBa)) { return Math.Min(ax.Length, bx.Length); }        
+        // Here, point a and point must be on opposite sides of the normal from this point to the line,
+        // and distance from this point to the line segment is along the normal:
         return this.DistanceToLine(a, b);
     }
 }
 
 /// <summary>Represents a vector in a plane. Dx and Dy are dimensionless.</summary>
-public class Vector2D : IEquatable<Vector2D> {
-    public double Dx { get; init; }
-    public double Dy { get; init; }
-    public double Length2 => this.Dx * this.Dx + this.Dy * this.Dy;
+public class Vector2D {
+    public double Dx { get; private init; }
+    public double Dy { get; private init; }
+    /// <summary>Length of this vector; the L2-norm.</summary>
     public double Length => Math.Sqrt(this.Length2);
+    /// <summary>The square of the length, useful for comparisons at scale
+    /// without computing square roots.</summary>
+    public double Length2 => this.Dx * this.Dx + this.Dy * this.Dy;
+    /// <summary>The angle to which this vector points, in radians. </summary>
     public double Direction => Math.Atan2(this.Dy, this.Dx);
+    /// <summary>A new vector which is the exact reverse of this vector, i.e., (-Dx, -Dy).</summary>
     public Vector2D Reversed => new Vector2D(-Dx, -Dy);
 
     /// <summary>Private default constructor, to prevent user construction without input data.</summary>
@@ -201,6 +203,8 @@ public class Circle2D {
         Area = Math.PI * radius * radius;
     }
 
+    // TODO: add constructor from 3 points [ https://planetcalc.com/8116/ & scroll down ].
+    
     /// <summary>Returns true if this circle contains this Point2D, else return false.</summary>
     /// <param name="xy">The point to be tested (Point2D object).</param>
     /// <param name="includeEdges">True if a point directly on the circle's boundary is to be
@@ -208,11 +212,7 @@ public class Circle2D {
     /// <returns>True iff this circle contains this point.</returns>
     public bool ContainsPoint(Point2D xy, bool includeEdges = true) {
         var distance2 = Origin.VectorTo(xy).Length2;
-        // Console.WriteLine($"distance2:{distance2}  " +
-        //                   $"radius^2:{Radius * Radius}  " +
-        //                   $"diff:{distance2 - Radius * Radius}");
-        if (includeEdges)
-            return (distance2 <= Radius * Radius);
+        if (includeEdges) return (distance2 <= Radius * Radius);
         return (distance2 < Radius * Radius);
     }
 }

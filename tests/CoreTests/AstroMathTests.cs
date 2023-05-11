@@ -27,8 +27,11 @@ public class AstroMathTests {
         Assert.That(AstroMath.EuclidianModulo(-7.5, -4), Is.EqualTo(0.5));
         Assert.That(AstroMath.EuclidianModulo(0, 4), Is.EqualTo(0.0));
         Assert.That(AstroMath.EuclidianModulo(0, -4), Is.EqualTo(0.0));
+        Assert.That(AstroMath.EuclidianModulo(103, 4), Is.EqualTo(3));
+        Assert.That(AstroMath.EuclidianModulo(103, -4), Is.EqualTo(3));
         Assert.That(AstroMath.EuclidianModulo(7.5, 0), Is.Null);
         Assert.That(AstroMath.EuclidianModulo(-7.5, 0), Is.Null);
+        Assert.That(AstroMath.EuclidianModulo(0.3333, 1.777), Is.EqualTo(0.3333)); // exactness check.
     }
 
     [Test]
@@ -41,6 +44,8 @@ public class AstroMathTests {
         Assert.That(AstroMath.Wrap(360, 0, 360), Is.EqualTo(0));
         Assert.That(AstroMath.Wrap(367, 0, 360), Is.EqualTo(7));
         Assert.That(AstroMath.Wrap(667, 0, 360), Is.EqualTo(667 - 360));
+        Assert.That(AstroMath.Wrap(1.3333, 0.342, 1.866), 
+            Is.EqualTo(1.3333));  // exactness check.
         
         Assert.That(AstroMath.Wrap(-455, -180, 180), Is.EqualTo(-455 - (-360)));
         Assert.That(AstroMath.Wrap(-255, -180, 180), Is.EqualTo(-255 - (-360)));
@@ -62,6 +67,8 @@ public class AstroMathTests {
         Assert.That(AstroMath.Clamp(0, -23, 31), Is.EqualTo(0));
         Assert.That(AstroMath.Clamp(31, -23, 31), Is.EqualTo(31));
         Assert.That(AstroMath.Clamp(110, -23, 31), Is.EqualTo(31));
+        Assert.That(AstroMath.Clamp(1.3333, 0.342, 1.866), 
+            Is.EqualTo(1.3333)); // exactness check
         
         Assert.That(AstroMath.Clamp(-111, null, 31), Is.EqualTo(-111));
         Assert.That(AstroMath.Clamp(-23, null, 31), Is.EqualTo(-23));

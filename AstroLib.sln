@@ -5,6 +5,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doxygen", "doxygen", "{608B
 		Doxygen\AstroLib_Logo.png = Doxygen\AstroLib_Logo.png
 		Doxygen\AstroLib_Logo.psd = Doxygen\AstroLib_Logo.psd
 		Doxygen\Doxyfile = Doxygen\Doxyfile
+		Doxygen\AstroLib.css = Doxygen\AstroLib.css
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroLib.Core", "AstroLib.Core\AstroLib.Core.csproj", "{5B7DFCE5-D9D6-41CA-8726-D2B79BD4FFEB}"
@@ -14,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{668F4768-0514-4070-9E61-A3FFCA391ACC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroLib.Catalog", "AstroLib.Catalog\AstroLib.Catalog.csproj", "{CD93A730-182C-48DB-92BA-96A4C2637717}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroLib.Observer", "AstroLib.Observer\AstroLib.Observer.csproj", "{8563AE50-981C-477B-B17F-40A7F681CD3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +40,10 @@ Global
 		{CD93A730-182C-48DB-92BA-96A4C2637717}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD93A730-182C-48DB-92BA-96A4C2637717}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD93A730-182C-48DB-92BA-96A4C2637717}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8563AE50-981C-477B-B17F-40A7F681CD3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8563AE50-981C-477B-B17F-40A7F681CD3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8563AE50-981C-477B-B17F-40A7F681CD3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8563AE50-981C-477B-B17F-40A7F681CD3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Maths\" />
       <Folder Include="_External Docs\" />
     </ItemGroup>
 

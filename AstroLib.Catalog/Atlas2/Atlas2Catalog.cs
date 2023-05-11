@@ -1,5 +1,7 @@
 using System.Text.RegularExpressions;
 
+/// @namespace AstroLib.Catalog.Atlas2
+/// All classes that directly handle the ATLAS refcat2 star catalog.
 namespace AstroLib.Catalog.Atlas2;
 
 /// <summary>Provides user access to an installation of the

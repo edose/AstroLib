@@ -218,40 +218,36 @@ public class Atlas2StarsTests {
     public void Class_Property_Tests() {
         // Properties Count and indexer were tested in Constructor_Tests() above.
         
-        // .NullCount:
-        {
-            var stars = new Atlas2Stars(cat, 149, 71);
-            Assert.That(stars.NullCount, Is.EqualTo(stars.Count));
-            var dateA = new DateTime(2023, 4, 23, 0, 0, 0);
-            foreach (var star in stars.Stars) star.OfDate = dateA;
-            Assert.That(stars.NullCount, Is.Zero);
-            stars[2].OfDate = null;
-            Assert.That(stars.NullCount, Is.EqualTo(1));
-        }
-
-        // .AllDatesValid:
+        // .NullCount and .AllDatesValid:
         {
             // Case: no stars in Atlas2Stars object:
-            var stars = new Atlas2Stars(new List<Atlas2Star>()); 
+            var stars = new Atlas2Stars(new List<Atlas2Star>());
+            Assert.That(stars.NullCount, Is.Zero);
             Assert.That(stars.AllDatesValid == false);
             
-            // Case: absent (all null) OfDate values: 
+            // Case: all stars have (original) null value for OfDate:
             stars = new Atlas2Stars(cat, 149, 71);
-            Assert.That(stars.Count, Is.EqualTo(872));
+            Assert.That(stars.NullCount, Is.EqualTo(stars.Count));
             Assert.That(stars.AllDatesValid == false);
             
-            // Case: a non-uniform OfDate value:
+            // Case: one star has null value for OfDate:
             var dateA = new DateTime(2023, 4, 23, 0, 0, 0);
-            var dateB = new DateTime(2023, 4, 11, 11, 11, 11);
-            foreach (var star in stars.Stars) star.OfDate = dateA;
-            Assert.That(stars.AllDatesValid == true);
-            stars[1].OfDate = dateB;
+            foreach (var star in stars.Stars.GetRange(1, stars.Stars.Count - 1)) 
+                star.UpdateRaDecForDate(dateA);
+            Assert.That(stars.NullCount, Is.EqualTo(1));
             Assert.That(stars.AllDatesValid == false);
             
-            // Case: a null OfDate value: 
-            foreach (var star in stars.Stars) star.OfDate = dateA;
+            // Case: all stars have properly assigned and equal values for OfDate:
+            foreach (var star in stars.Stars) 
+                star.UpdateRaDecForDate(dateA);
+            Assert.That(stars.NullCount, Is.Zero);
             Assert.That(stars.AllDatesValid == true);
-            stars[2].OfDate = null;
+            
+            // Case: one star has different value for OfDate:
+            var dateB = new DateTime(2023, 4, 23, 11, 11, 11);
+            foreach (var star in stars.Stars.GetRange(1, stars.Stars.Count - 1)) 
+                star.UpdateRaDecForDate(dateB);
+            Assert.That(stars.NullCount, Is.Zero);
             Assert.That(stars.AllDatesValid == false);
         }
     }

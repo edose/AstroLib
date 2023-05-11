@@ -129,9 +129,9 @@ public sealed class Longitude : Angle {
     private Longitude() {}
     
     /// <summary>Constructor from a double representing radians.</summary>
-    /// <param name="radians">The magnitude of this Longitude, limited to [-pi, pi].</param>
-    /// <param name="wrapToRange">If true, wrap values outside the validity range [-pi, pi] to inside
-    /// that range. If false, values outside the validity range cause an exception.</param>
+    /// <param name="radians">The magnitude of this Longitude, limited to [-pi, +pi).</param>
+    /// <param name="wrapToRange">If true, wrap values outside the validity range [-pi, +pi) to inside
+    /// that range. If false, values outside the validity range cause an ArgumentException.</param>
     /// <exception cref="ArgumentException">Thrown if input value is outside the validity range and
     /// user has disallowed clamping (via clampToRange=false).</exception>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
