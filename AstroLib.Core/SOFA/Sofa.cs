@@ -9,13 +9,13 @@ using AstroLib.Core.Utils;
 namespace AstroLib.Core.SOFA;
 
 /*########################################################################################################*/
-// Due diligence statement from the author of this class and its resulting assembly (.dll file):
-// This work:
+// Due diligence statement from the principal author of this class and its resulting assembly (.dll file):
+// This work (AstroLib.Sofa):
 // (i) calls routines and computations that I derived from software provided by SOFA under license; and
 // (ii) does not itself constitute software provided by and/or endorsed by SOFA.
 // (iii) calls *compiled* C-language functions from C-language source code provided by SOFA,
 //       but does not distribute that original source code. We offer instead a .NET-based API to SOFA
-//       function, which API is especially suitable for calling from another user's own C#-language code.
+//       functions, which API is especially suitable for calling from another user's own C#-language code.
 /*########################################################################################################*/
 //  Correspondence concerning SOFA software should be addressed as follows:
 //
@@ -37,6 +37,44 @@ public static class Sofa {
         var dllFullpath = Path.Combine(DllDirectory, DllFilename);
         DllManager.LoadDllFromFullpath(dllFullpath);
     }
+
+    /// <summary> Star-independent astrometry parameters, as a C++ struct.
+    /// Vectors eb, eh, em, and v: with respect to axes of the BCRS (barycentric celestial ref. system).
+    /// As defined in SOFA's sofa.h source file.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct iauASTROM {
+        public double pmt;     // Proper motion time interval (Solar system barycenter, Julian years)
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]  // C++: double[3] eb
+        public double[] eb;    // Solar system barycenter to observer (vector, AU)
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]  // C++: double[3] eh
+        public double[] eh;    // Sun to observer (unit vector)
+        public double em;      // Distance from sun to observer (AU)
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]  // C++: double[3] v
+        public double[] v;     // Barycentric observer velocity (vector, units of c)
+        public double bm1;     // Reciprocal of Lorenz factor, i.e., sqrt(1-|v|^2)
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 9)]  // C++: double[3,3] bpn
+        public double[,] bpn;  // Bias-precession-nutation matrix
+        public double along;   // Longitude + s' + dETA(DUT) (radians)
+        public double xp1;     // Polar motion xp, with respect to local meridian (radians)
+        public double yp1;     // Polar motion yp, with respect to local meridian (radians)
+        public double sphi;    // Sine of geodetic latitude
+        public double cphi;    // Cosine of geodetic latitude
+        public double diurab;  // Magnitude of diurnal aberration vector
+        public double era1;    // "local" Earth rotation angle (radians)
+        public double refa;    // Refraction constant A (radians)
+        public double refb;    // Refraction constant B (radians)
+    }
+
+    /// <summary> Body parameters for light deflection.
+    /// As defined in SOFA's sofa.h source file.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct iauLDBODY {
+        public double bm;     // Mass of the light-deflecting body (solar masses)
+        public double dl;     // Deflection limiter (radians^2/2)
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]  //  C++: double[2,3] pv
+        public double[,] pv;  // Barycentric position/velocity of the light-deflecting body (AU, AU/day) 
+    }
+    
     
 #region "Astronomy/Calendars"
     /*######### Astronomy/Calendars ######################################################################*/
@@ -82,11 +120,10 @@ public static class Sofa {
 #region "Astronomy/Astrometry"    
     /*######### Astronomy/Astrometry #####################################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib):
-    //      iauAb     Apply aberration to transform natural direction into proper direction.
     //      iauApcg   For a geocentric observer, prepare star−independent astrometry parameters
     //                    for transformations between ICRS and GCRS coordinates.
     //                    The Earth ephemeris is supplied by the caller.
-    //      iauApcg13 As iauApcg, except caller supplies the date, and SOFA models used to predict
+    //      *** iauApcg13 As iauApcg, except caller supplies the date, and SOFA models used to predict
     //                    the Earth ephemeris.
     //      iauApci   For a terrestrial observer, prepare star−independent astrometry parameters
     //                    for transformations between ICRS and geocentric CIRS coordinates.
@@ -136,6 +173,198 @@ public static class Sofa {
     //      iauPmpx   Proper motion and parallax.
     // .....................................................................................................
     
+    // .....................................................................................................
+    // From SOFA C Manual, release 18:
+    // ...several functions...insert...into the astrom [iauASTROM] structure
+    // star−independent parameters needed for the chain of astrometric transformations
+    // ICRS <−> GCRS <−> CIRS <−> observed.
+    //
+    // The various functions support different classes of observer and portions
+    // of the transformation chain:
+    //
+    //    ____functions____     observer     transformation
+    // 
+    //   iauApcg   iauApcg13   geocentric    ICRS <−> GCRS
+    //   iauApci   iauApci13   terrestrial   ICRS <−> CIRS
+    //   iauApco   iauApco13   terrestrial   ICRS <−> observed
+    //   iauApcs   iauApcs13   space         ICRS <−> GCRS
+    //   iauAper   iauAper13   terrestrial   update Earth rotation
+    //   iauApio   iauApio13   terrestrial   CIRS <−> observed
+    // .....................................................................................................
+    
+    
+    /// <summary> Sofa.Ab(): Apply aberration to transform natural direction into proper direction.
+    /// </summary>
+    /// <param name="pnat">Natural direction to the source (unit vector).</param>
+    /// <param name="v">Observer barycentric velocity in units of c.</param>
+    /// <param name="s">Distance between the Sun and the observer (AU).</param>
+    /// <param name="bm1">Sqrt(1 - |v|^2), the reciprocal of Lorenz factor.</param>
+    /// <returns>Proper direction to the source (unit vector).</returns>
+    public static double[] Ab(double[] pnat, double[] v, double s, double bm1) {
+        var ppr = new double[3] {0, 0, 0};
+        S_Ab(pnat, v, s, bm1, ppr);
+        return ppr;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauAb", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Ab(double[] pnat, double[] v, double s, double bm1, [In, Out] double[] ppr);   
+    
+    
+    /// <summary> Sofa.Apcg13(): For a GEOCENTRIC OBSERVER, prepare star−independent astrometry parameters
+    /// for transformations between ICRS and GCRS coordinates. The caller supplies the date,
+    /// and SOFA models are used to predict the Earth ephemeris. The parameters produced by this function
+    /// are required in the parallax, light deflection and aberration parts of the astrometric
+    /// transformation chain.</summary>
+    /// <param name="date1">TDB as Julian date, part 1.
+    /// TT maybe used without significant loss of accuracy.</param>
+    /// <param name="date2">TDB as Julian date, part 2.
+    /// TT maybe used without significant loss of accuracy.</param>
+    /// <returns>Star−independent astrometry parameters, as a iauASTROM struct.
+    /// Unchanged struct elements: along, xp1, yp1, sphi, cphi, diurab, era1, refa, refb.</returns>
+    public static iauASTROM Apcg13(double date1, double date2) {
+        var astrom = new iauASTROM();
+        S_Apcg13(date1, date2, ref astrom);
+        return astrom;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauApcg13", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Apcg13(double date1, double date2, ref iauASTROM astrom); 
+    
+    
+    /// <summary> Sofa.Apci13(): For a TERRESTRIAL OBSERVER, prepare star−independent astrometry parameters
+    /// for transformations between ICRS and GCRS coordinates. The caller supplies the date,
+    /// and SOFA models are used to predict the Earth ephemeris. The parameters produced by this function
+    /// are required in the parallax, light deflection and aberration parts of the astrometric
+    /// transformation chain.</summary>
+    /// <param name="date1">TDB as Julian date, part 1.
+    /// TT maybe used without significant loss of accuracy.</param>
+    /// <param name="date2">TDB as Julian date, part 2.
+    /// TT maybe used without significant loss of accuracy.</param>
+    /// <returns> 2-Tuple:
+    ///     astrom: Star−independent astrometry parameters, as a iauASTROM struct.
+    ///             Unchanged struct elements: along, xp1, yp1, sphi, cphi, diurab, era1, refa, refb.
+    ///     eo: equation of the origins (i.e., ERA-GST).</returns>
+    public static Tuple<iauASTROM, double> Apci13(double date1, double date2) {
+        var astrom = new iauASTROM();
+        double eo = 0;
+        S_Apci13(date1, date2, ref astrom, ref eo);
+        var result = Tuple.Create(astrom, eo);
+        return result;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauApci13", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Apci13(double date1, double date2, ref iauASTROM astrom, ref double eo);
+
+
+    /// <summary> Sofa.Apco13(): For a TERRESTRIAL OBSERVER, prepare star−independent astrometry parameters
+    /// for transformations between ICRS and GCRS coordinates. The caller supplies UTC, site coordinates,
+    /// ambient air conditions and observing wavelength, and SOFA models are used to predict
+    /// the Earth ephemeris. The parameters produced by this function are required in the parallax,
+    /// light deflection and aberration parts of the astrometric transformation chain.</summary>
+    /// <param name="utc1">UTC as quasi-Julian date, part 1. Use Sofa.Dtf2d() to convert from calendar
+    /// date and time of day into 2-part quasi-Julian date, as it implements the proper leap-second
+    /// ambiguity convention.</param>
+    /// <param name="utc2">UTC as quasi-Julian date, part 2.</param>
+    /// <param name="dut1">UT1-UTC (seconds). Tabulated in IERS bulletins. </param>
+    /// <param name="elong">Longitude of observer (radians, WGS84). CAUTION: east positive).</param>
+    /// <param name="phi">Latitude of observer (radians, geodetic).</param>
+    /// <param name="hm">Height above ellipsoid (meters, geodetic).</param>
+    /// <param name="xp">Polar motion x coordinate (radians).
+    /// Obtained from IERS bulletins, or may be set to zero with little consequence.</param>
+    /// <param name="yp">Polar motion y coordinate (radians).
+    /// Obtained from IERS bulletins, or may be set to zero with little consequence.</param>
+    /// <param name="phpa">Pressure at the observer (hPa = mb) May be estimated from hm as
+    /// 1013.25 * exp(-hm / (29.3 * tsl)) where tsl is approx. sea-level temperature Kelvin.</param>
+    /// <param name="tc">Ambient temperature at the observer (deg C).</param>
+    /// <param name="rh">Relative humidity at the observer (range 0-1).</param>
+    /// <param name="w1">Wavelength of observation (micrometers).</param>
+    /// <returns> 2-Tuple:
+    ///     astrom: Star−independent astrometry parameters, as a iauASTROM struct.
+    ///             Unchanged struct elements: along, xp1, yp1, sphi, cphi, diurab, era1, refa, refb.
+    ///     eo: equation of the origins (i.e., ERA-GST).</returns>
+    public static iauASTROM Apco13(double utc1, double utc2, double dut1, double elong,
+        double phi, double hm, double xp, double yp, double phpa, double tc, double rh, double w1) {
+        var astrom = new iauASTROM();
+        S_Apco13(utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, ref astrom);
+        return astrom;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauApco13", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Apco13(double utc1, double utc2, double dut1, double elong, double phi, double hm,
+        double xp, double yp, double phpa, double tc, double rh, double w1, ref iauASTROM astrom);
+
+
+    /// <summary> Sofa.Apcs13(): For an observer at known geocentric position and velocity,
+    /// prepare star−independent astrometry parameters
+    /// for transformations between ICRS and GCRS coordinates. The caller supplies the date,
+    /// and SOFA models are used to predict the Earth ephemeris. The parameters produced by this function
+    /// are required in the parallax, light deflection and aberration parts of the astrometric
+    /// transformation chain.
+    ///
+    /// No assumptions are made about proximity to the earth, and this function may be used for deep space
+    /// applications as well as Earth orbit and terrestrial locations.</summary>
+    /// <param name="date1">TDB as Julian date, part 1.
+    /// TT maybe used without significant loss of accuracy.</param>
+    /// <param name="date2">TDB as Julian date, part 2.
+    /// TT maybe used without significant loss of accuracy.</param>
+    /// <param name="pv">Observer's geocentric position/velocity vectors, with respect to BCRS
+    /// (Barycentric) axes, and NOT geocentric axes. (meters, meters/second).</param>
+    /// <returns>Star−independent astrometry parameters, as a iauASTROM struct.
+    /// Unchanged struct elements: along, xp1, yp1, sphi, cphi, diurab, era1, refa, refb.</returns>
+    public static iauASTROM Apcs13(double date1, double date2, double[,] pv) {
+        var astrom = new iauASTROM();
+        S_Apcs13(date1, date2, pv, ref astrom);
+        return astrom;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauApcs13", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Apcs13(double date1, double date2, double[,] pv, ref iauASTROM astrom); 
+    
+        
+    /// <summary> Sofa.Aper13(): For a TERRESTRIAL OBSERVER, use longitude to update "local" Earth rotation
+    /// angle only.</summary>
+    /// <param name="ut11">UT1 (not UTC) as Julian date, part 1.</param>
+    /// <param name="ut12">UT1 (not UTC) as Julian date, part 2.</param>
+    /// <param name="astrom">Astrometry struct iauASTROM, but only the along element is used.</param>
+    /// <returns>astrom: Star−independent astrometry parameter era1, as the only updated element of
+    /// this iauASTROM struct.</returns>
+    public static iauASTROM Aper13(double ut11, double ut12, ref iauASTROM astrom) {
+        S_Aper13(ut11, ut12, ref astrom);
+        return astrom;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauAper13", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Aper13(double ut11, double ut12, ref iauASTROM astrom);
+
+    
+    /// <summary> Sofa.Apio13(): For a TERRESTRIAL OBSERVER, prepare star−independent astrometry parameters
+    /// for transformations between CIRS and observed coordinates. The caller supplies UTC, site coordinates,
+    /// ambient air conditions and observing wavelength, and SOFA models are used to predict
+    /// the Earth ephemeris. The parameters produced by this function are required in the parallax,
+    /// light deflection and aberration parts of the astrometric transformation chain.</summary>
+    /// <param name="utc1">UTC as quasi-Julian date, part 1. Use Sofa.Dtf2d() to convert from calendar
+    /// date and time of day into 2-part quasi-Julian date, as it implements the proper leap-second
+    /// ambiguity convention.</param>
+    /// <param name="utc2">UTC as quasi-Julian date, part 2.</param>
+    /// <param name="dut1">UT1-UTC (seconds). Tabulated in IERS bulletins. </param>
+    /// <param name="elong">Longitude of observer (radians, WGS84). CAUTION: east positive).</param>
+    /// <param name="phi">Latitude of observer (radians, geodetic).</param>
+    /// <param name="hm">Height above ellipsoid (meters, geodetic).</param>
+    /// <param name="xp">Polar motion x coordinate (radians).
+    /// Obtained from IERS bulletins, or may be set to zero with little consequence.</param>
+    /// <param name="yp">Polar motion y coordinate (radians).
+    /// Obtained from IERS bulletins, or may be set to zero with little consequence.</param>
+    /// <param name="phpa">Pressure at the observer (hPa = mb) May be estimated from hm as
+    /// 1013.25 * exp(-hm / (29.3 * tsl)) where tsl is approx. sea-level temperature Kelvin.</param>
+    /// <param name="tc">Ambient temperature at the observer (deg C).</param>
+    /// <param name="rh">Relative humidity at the observer (range 0-1).</param>
+    /// <param name="w1">Wavelength of observation (micrometers).</param>
+    /// <returns> astrom: Star−independent astrometry parameters, as a iauASTROM struct.
+    /// Struct elements unchanged: pmt, eb, eh, em, v, bm1, bpn.</returns>
+    public static iauASTROM Apio13(double utc1, double utc2, double dut1, double elong,
+        double phi, double hm, double xp, double yp, double phpa, double tc, double rh, double w1) {
+        var astrom = new iauASTROM();
+        S_Apio13(utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, ref astrom);
+        return astrom;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauApio13", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Apio13(double utc1, double utc2, double dut1, double elong, double phi, double hm,
+        double xp, double yp, double phpa, double tc, double rh, double w1, ref iauASTROM astrom);
+    
     
     /// <summary>Sofa.Atcc13(): Transform a star’s ICRS catalog entry (epoch J2000.0) into ICRS
     ///                         astrometric place (update J2000.0 RA,Dec to datetime other than 2000.0).
@@ -158,6 +387,32 @@ public static class Sofa {
     [DllImport(DllFilename, EntryPoint = "iauAtcc13", CallingConvention = CallingConvention.Cdecl)]
     static extern double S_Atcc13(double rc, double dc, double pr, double pd, double px, double rv,
         double date1, double date2, ref double ra, ref double da);   
+
+    
+    /// <summary> Sofa.Atccq(): Quick transformation of a star’s ICRS catalog entry (epoch J2000.0)
+    /// into ICRS astrometric place, given precomputed star−independent astrometry parameters.
+    ///
+    /// Use of this function is appropriate when efficiency is important and where many star positions
+    /// are to be transformed for one date. The star−independent parameters can be obtained by calling
+    /// one of the functions iauApci[13], iauApcg[13], iauApco[13] or iauApcs[13].</summary>
+    /// <param name="rc">ICRS RA at J2000.0 (radians).</param>
+    /// <param name="dc">ICRS Dec at J2000.0 (radians).</param>
+    /// <param name="pr">RA proper motion (radians/year, in raw dRA/dt, not in cos(Dec)*dRA/dt).</param>
+    /// <param name="pd">Dec proper motion (radians/year).</param>
+    /// <param name="px">Parallax (arcseconds).</param>
+    /// <param name="rv">Radial valocity (km/s, positive for receding).</param>
+    /// <param name="astrom">Star-independent astrometry parameters, as a iauASTROM struct generated
+    /// by another SOFA function..</param>
+    /// <returns>2-tuple:  ra: ICRS astrometric Right Ascension (radians).
+    ///                    dec: ICRS astrometric Declination (radians).</returns>
+    public static Tuple<double, double> Atccq(double rc, double dc, double pr, double pd, 
+        double px, double rv, iauASTROM astrom) {
+        double ra = 0, da = 0;
+        S_Atccq(rc, dc, pr, pd, px, rv, astrom, ref ra, ref da);
+        return Tuple.Create(ra, da); }
+    [DllImport(DllFilename, EntryPoint = "iauAtccq", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Atccq(double rc, double dc, double pr, double pd, double px, double rv,
+        iauASTROM astrom, ref double ra, ref double da);   
     
     
     /// <summary>Sofa.Atci13(): Transform ICRS star data, epoch J2000.0, to CIRS.
@@ -180,6 +435,9 @@ public static class Sofa {
     [DllImport(DllFilename, EntryPoint = "iauAtci13", CallingConvention = CallingConvention.Cdecl)]
     static extern double S_Atci13(double rc, double dc, double pr, double pd, double px, double rv,
         double date1, double date2, ref double ri, ref double di, ref double eo); 
+    
+    
+    
     
     
     /// <summary>Sofa.Atco13(): ICRS RA,Dec to observed place. The caller supplies UTC,
@@ -300,11 +558,11 @@ public static class Sofa {
         double dut1, double elong, double phi, double hm, double xp, double yp, 
         double phpa, double tc, double rh, double wl) {
         double rc = 0, dc = 0;
-        S_Atoc13(ref type, ob1, ob2, utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, wl,
+        S_Atoc13(type, ob1, ob2, utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, wl,
             ref rc, ref dc);
         return Tuple.Create(rc, dc); }
     [DllImport(DllFilename, EntryPoint = "iauAtoc13", CallingConvention = CallingConvention.Cdecl)]
-    static extern double S_Atoc13(ref string type, double ob1, double ob2, double utc1, double utc2, 
+    static extern double S_Atoc13(string type, double ob1, double ob2, double utc1, double utc2, 
         double dut1, double elong, double phi, double hm, double xp, double yp, double phpa, double tc, 
         double rh, double wl, ref double rc, ref double dc); 
     
@@ -664,12 +922,9 @@ public static class Sofa {
         var gast = S_Gst06a(uta, utb, tta, ttb);
         return gast; }
     [DllImport(DllFilename, EntryPoint = "iauGst06a", CallingConvention = CallingConvention.Cdecl)]
-    static extern double S_Gst06a(double uta, double utb, double tta, double ttb); 
+    static extern double S_Gst06a(double uta, double utb, double tta, double ttb);
 
-    
-    
-    
-#endregion    
+    #endregion    
     
 #region "Astronomy/SpaceMotion"
     /*######### Astronomy/SpaceMotion ####################################################################*/
@@ -860,7 +1115,7 @@ public static class Sofa {
     /// <param name="height">Height above ellipsoid (meters, geodetic).</param>
     /// <returns>Geocentric vector (all 3 values in meters).</returns>
     public static double[] Gd2gc(int n, double elong, double phi, double height) {
-        double[] xyz = new double[3] {0, 0, 0}; 
+        var xyz = new double[3] {0, 0, 0}; 
         var status = S_Gd2gc(n, elong, phi, height, xyz);
         return xyz; }
     [DllImport(DllFilename, EntryPoint = "iauGd2gc", CallingConvention = CallingConvention.Cdecl)]
@@ -891,12 +1146,12 @@ public static class Sofa {
     ///                    int array [hours, minutes, seconds, fraction])</returns>
     public static Tuple<int, int, int, int[]> D2dtf(string scale, int ndp, double d1, double d2) {
         int iy = 0, im = 0, id = 0;
-        var ihmsf = new Int32[4];
+        var ihmsf = new Int32[4] {0, 0, 0, 0};
         var status = S_D2dtf(scale, ndp, d1, d2, ref iy, ref im, ref id, ihmsf);
         return Tuple.Create(iy, im, id, ihmsf); }
     [DllImport(DllFilename, EntryPoint = "iauD2dtf", CallingConvention = CallingConvention.Cdecl)]
     static extern int S_D2dtf(string scale, int ndp, double d1, double d2, 
-        ref int iy, ref int im, ref int id, int[] ihmsf);
+        ref int iy, ref int im, ref int id, [In, Out] int[] ihmsf);
     
     
     /// <summary>Sofa.Dat(): For a given UTC date, calculate Delta(AT) = TAI−UTC</summary>
@@ -1314,24 +1569,125 @@ public static class Sofa {
 #region "VectorMatrix (all)"
     /*######### VectorMatrix/AngleOps ####################################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib.Geometry):
-    //      iauA2af: Decompose radians into degrees, arcminutes, arcseconds, fraction.
-    //      iauA2tf: Decompose radians into hours, minutes, seconds, fraction.
     //      iauAf2a: Convert degrees, arcminutes, arcseconds to radians.
     //      iauAnp:  Normalize angle into the range 0 <= a < 2pi.
     //      iauAnpm: Normalize angle into the range -pi <= a < +pi.
     //      iauD2tf: Decompose days to hours, minutes, seconds, fraction.
-    //      iauTf2a   Convert hours, minutes, seconds to radians.
     //      iauTf2d   Convert hours, minutes, seconds to days.
     // .....................................................................................................
     
     
-    /*######### VectorMatrix/BuildRotations ##############################################################*/
-    // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib.Geometry):
-    //      iauRx     Rotate an r−matrix about the x−axis.
-    //      iauRy     Rotate an r−matrix about the y−axis.
-    //      iauRz     Rotate an r−matrix about the z−axis.
-    // .....................................................................................................
+    /// <summary> iauA2af: Decompose radians into degrees, arcminutes, arcseconds, fraction.</summary>
+    /// <param name="ndp">Resolution, as negative 10-exponent of last decimal place,
+    /// e.g., -2 for rounding to hundreds, +1 for rounding to 1/10, +6 for rounding to millionths.</param>
+    /// <param name="angle">Input angle (radians). May exceed 2*pi.
+    /// NB: user is responsible for handling when near 360 degrees.</param>
+    /// <returns>2-Tuple:
+    ///     sign (string of length one): '+' or '-'.
+    ///     idmsf (int array of length 4):
+    ///         degrees, arcminutes, arcseconds, fraction in the requested resolution.</returns>
+    // TODO: In testing: determine what idmsf[3] (fraction) is supposed to represent for various values of ndp.
+    public static Tuple<string, int[]> A2af(int ndp, double angle) {
+        string sign = " ";
+        var idmsf = new int[4] {0, 0, 0, 0}; 
+        S_A2af(ndp, angle, sign, idmsf);
+        var result = Tuple.Create(sign, idmsf);
+        return result;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauA2af", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_A2af(int ndp, double angle, string sign, int[] idmsf);
     
+    
+    /// <summary> iauA2tf: Decompose radians into hours, minutes, seconds, fraction.</summary>
+    /// <param name="ndp">Resolution, as negative 10-exponent of last decimal place,
+    /// e.g., -2 for rounding to hundreds, +1 for rounding to 1/10, +6 for rounding to millionths.</param>
+    /// <param name="angle">Input angle (radians). May exceed 2*pi.
+    /// NB: user is responsible for handling when near 360 degrees.</param>
+    /// <returns>2-Tuple:
+    ///     sign (string of length one): '+' or '-'.
+    ///     ihmsf (int array of length 4):
+    ///         hours, minutes, seconds, fraction in the requested resolution.</returns>
+    // TODO: Determine what ihmsf[3] (fraction) is supposed to represent for various values of ndp.
+    public static Tuple<string, int[]> A2tf(int ndp, double angle) {
+        string sign = " ";
+        var ihmsf = new int[4] {0, 0, 0, 0}; 
+        S_A2tf(ndp, angle, sign, ihmsf);
+        var result = Tuple.Create(sign, ihmsf);
+        return result;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauA2tf", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_A2tf(int ndp, double angle, string sign, int[] ihmsf);
+
+
+    /// <summary> Sofa.Tf2a(): Convert hours, minutes, seconds to angle in radians.</summary>
+    /// <param name="s">sign (char), '-' means negative, any other means positive.</param>
+    /// <param name="ihour">hours (int)</param>
+    /// <param name="imin">minutes (int)</param>
+    /// <param name="sec">seconds (double)</param>
+    /// <returns>angle (radians)</returns>
+    public static double Tf2a(char s, int ihour, int imin, double sec) {
+        double rad = 0;
+        var status = S_Tf2a(s, ihour, imin, sec, ref rad);
+        return rad;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauTf2a", CallingConvention = CallingConvention.Cdecl)]
+    static extern int S_Tf2a(char s, int ihour, int imin, double sec, ref double rad);
+    
+    
+    /// <summary> Sofa.Tf2d(): Convert hours, minutes, seconds to days. </summary>
+    /// <param name="s">sign (char), '-' means negative, any other means positive.</param>
+    /// <param name="ihour">hours (int)</param>
+    /// <param name="imin">minutes (int)</param>
+    /// <param name="sec">seconds (double)</param>
+    /// <returns>days (double)</returns>
+    public static double Tf2d(char s, int ihour, int imin, double sec) {
+        double days = 0;
+        var status = S_Tf2a(s, ihour, imin, sec, ref days);
+        return days;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauTf2d", CallingConvention = CallingConvention.Cdecl)]
+    static extern int S_Tf2d(char s, int ihour, int imin, double sec, ref double days);
+    
+    
+    /*######### VectorMatrix/BuildRotations ##############################################################*/
+    // .....................................................................................................
+
+
+    /// <summary> Sofa.Rx(): Rotate a rotation matrix about the x−axis.</summary>
+    /// <param name="phi">Newly applied rotation angle (radians).</param>
+    /// <param name="r">Rotation matrix before new rotation.</param>
+    /// <returns>Rotation matrix after new rotation.</returns>
+    public static double[,] Rx(double phi, double[,] r) {
+        S_Rx(phi, r);
+        return r;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauRx", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Rx(double phi, [In, Out] double[,] r);
+    
+    
+    /// <summary> Sofa.Ry(): Rotate a rotation matrix about the y−axis.</summary>
+    /// <param name="theta">Newly applied rotation angle (radians).</param>
+    /// <param name="r">Rotation matrix before new rotation.</param>
+    /// <returns>Rotation matrix after new rotation.</returns>
+    public static double[,] Ry(double theta, double[,] r) {
+        S_Ry(theta, r);
+        return r;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauRy", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Ry(double theta, [In, Out] double[,] r);
+    
+    
+    /// <summary> Sofa.Rz(): Rotate a rotation matrix about the z−axis.</summary>
+    /// <param name="psi">Newly applied rotation angle (radians).</param>
+    /// <param name="r">Rotation matrix before new rotation.</param>
+    /// <returns>Rotation matrix after new rotation.</returns>
+    public static double[,] Rz(double psi, double[,] r) {
+        S_Rz(psi, r);
+        return r;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauRz", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Rz(double psi, [In, Out] double[,] r);
+
     
     /*######### VectorMatrix/CopyExtendExtract ###########################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib.Geometry):
@@ -1354,19 +1710,56 @@ public static class Sofa {
     
     /*######### VectorMatrix/MatrixOps ###################################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib.Geometry):
-    //      iauRxr    Multiply two r−matrices.
-    //      iauTr     Transpose an r−matrix.
     // .....................................................................................................
 
+
+    /// <summary> Multiply two rotation matrices. NB: not commutative, Rxr(a, b) != Rxr(b, a).
+    /// Same array may be used for any of the arguments.</summary>
+    /// <param name="a">First rotation matrix.</param>
+    /// <param name="b">Second rotation matrix.</param>
+    /// <returns>a * b.</returns>
+    public static double[,] Rxr(double[,] a, double[,] b) {
+        var atb = new double[3, 3] {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        S_Rxr(a, b, atb);
+        return atb;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauRxr", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Rxr(double[,] a, double[,] b, [In, Out] double[,] atb);
+    
+    
+    /// <summary> Return transpose of a rotation matrix.</summary>
+    /// <param name="r">Rotation matrix before transposition.</param>
+    /// <returns>Transposed rotation matrix.</returns>
+    public static double[,] Tr(double[,] r) {
+        var rt = new double[3, 3] {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        S_Tr(r, rt);
+        return rt;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauTr", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Tr(double[,] r, [In, Out] double[,] rt);
+    
     
     /*######### VectorMatrix/MatrixVectorProducts ########################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib.Geometry):
-    //      iauRxp    Multiply a p−vector by an r−matrix.
+    //      *** iauRxp    Multiply a p−vector by an r−matrix.
     //      iauRxpv   Multiply a pv−vector by an r−matrix.
     //      iauTrxp   Multiply a p−vector by the transpose of an r−matrix.
     //      iauTrxpv  Multiply a pv−vector by the transpose of an r−matrix.
     // .....................................................................................................
-    
+
+
+    /// <summary>Sofa.Rxp(): Multiply a position vector by a rotation matrix.</summary>
+    /// <param name="r">Rotation matrix.</param>
+    /// <param name="p">Position vector.</param>
+    /// <returns>Position vector after rotation, i.e., r * p.</returns>
+    public static double[] Rxp(double[,] r, double[] p) {
+        var rp = new double[3] {0, 0, 0};
+        S_Rxp(r, p, rp);
+        return rp;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauRxp", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Rxp(double[,] r, double[] p, [In, Out] double[] rp);
+
     
     /*######### VectorMatrix/RotationVectors #############################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib.Geometry):
@@ -1380,12 +1773,12 @@ public static class Sofa {
     //      iauPap    Position−angle from two p−vectors.
     //      iauPas    Position−angle from spherical coordinates.
     // .....................................................................................................
-
     
+
     /// <summary>Sofa.Sepp(): Angular separation between two p−vectors.</summary>
     /// <param name="a">First p−vector (not necessarily unit length)</param>
     /// <param name="b">Second p−vector (not necessarily unit length)</param>
-    /// <returns>Angular separation (radians, always positive)</returns>
+    /// <returns>Angular separation (radians, always in range [0, pi])</returns>
     public static double Sepp(double[] a, double[] b) {
         return S_Sepp(a, b); }
     [DllImport(DllFilename, EntryPoint = "iauSepp", CallingConvention = CallingConvention.Cdecl)]
@@ -1406,13 +1799,93 @@ public static class Sofa {
     
     /*######### VectorMatrix/SphericalCartesian ##########################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib.Geometry):
-    //      iauC2s    P-vector to spherical coordinates.
-    //      iauP2s    P−vector to spherical polar coordinates.
-    //      iauPv2s   Convert position/velocity from Cartesian to spherical coordinates.
-    //      iauS2c    Convert spherical coordinates to Cartesian.
-    //      iauS2p    Convert spherical polar coordinates to p−vector.
-    //      iauS2pv   Convert position/velocity from spherical to Cartesian coordinates.
+    //      iauS2c    Convert spherical coordinates to Cartesian (direction cosines).
     // .....................................................................................................
+    
+    
+    /// <summary>Sofa.C2s(): Convert position vector to spherical coordinates.</summary>
+    /// <param name="p">Position vector (double[3]) of any magnitude, only its direction is used.</param>
+    /// <returns>2-Tuple:
+    ///     theta (double): longitude angle (radians)
+    ///     phi (double): latitude angle (radians)</returns>
+    public static Tuple<double, double> C2s(double[] p) {
+        double theta = 0, phi = 0;
+        S_C2s(p, ref theta, ref phi);
+        var result = Tuple.Create(theta, phi);
+        return result;
+    }    
+    [DllImport(DllFilename, EntryPoint = "iauC2s", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_C2s(double[] p, ref double theta, ref double phi);
+    
+    
+    /// <summary>Sofa.P2s(): Convert position vector to spherical polar coordinates.</summary>
+    /// <param name="p">Position vector (double[3]) of any magnitude, only its direction is used.</param>
+    /// <returns>3-Tuple:
+    ///     theta (double): longitude angle (radians)
+    ///     phi (double): latitude angle (radians)
+    ///     r (double): radial distance</returns>
+    public static Tuple<double, double, double> P2s(double[] p) {
+        double theta = 0, phi = 0, r = 0;
+        S_P2s(p, ref theta, ref phi, ref r);
+        var result = Tuple.Create(theta, phi, r);
+        return result;
+    }    
+    [DllImport(DllFilename, EntryPoint = "iauP2s", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_P2s(double[] p, ref double theta, ref double phi, ref double r);
+
+    
+    /// <summary>Sofa.Pv2s(): Convert position/velocity from Cartesian to spherical coordinates
+    /// The inverse of function Sofa.S2pv().</summary>
+    /// <param name="pv">Position/velocity vectors as double[2,3]</param>
+    /// <returns>6-Tuple:
+    ///     theta (double): longitude angle (radians)
+    ///     phi (double): latitude angle (radians)
+    ///     r (double): radial distance
+    ///     td (double): rate of change of theta
+    ///     pd (double): rate of change of phi
+    ///     rd (double): rate of change of radius</returns>
+    public static Tuple<double, double, double, double, double, double> Pv2s(double[,] pv) {
+        double theta = 0, phi = 0, r = 0, td = 0, pd = 0, rd = 0;
+        S_Pv2s(pv, ref theta, ref phi, ref r, ref td, ref pd, ref rd);
+        var result = Tuple.Create(theta, phi, r, td, pd, rd);
+        return result;
+    }    
+    [DllImport(DllFilename, EntryPoint = "iauPv2s", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Pv2s(double[,] pv, ref double theta, ref double phi, ref double r,
+        ref double td, ref double pd, ref double rd);
+
+
+    /// <summary> Sofa.S2p(): Convert spherical polar coordinates to p−vector.</summary>
+    /// <param name="theta">longitude angle (radians)</param>
+    /// <param name="phi">latitude angle (radians)</param>
+    /// <param name="r">radial distance</param>
+    /// <returns>Cartesian coordinates.</returns>
+    public static double[] S2p(double theta, double phi, double r) {
+        var p = new double[3] {0, 0, 0};
+        S_S2p(theta, phi, r, p);
+        return p;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauS2p", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_S2p(double theta, double phi, double r, double[] p);
+    
+
+    /// <summary> Sofa.S2pv(): Convert position/velocity from spherical to Cartesian coordinates.
+    /// The inverse of function Sofa.Pv2s().</summary>
+    /// <param name="theta">longitude angle (radians)</param>
+    /// <param name="phi">latitude angle (radians)</param>
+    /// <param name="r">radial distance</param>
+    /// <param name="td">rate of change of theta</param>
+    /// <param name="pd">rate of change of phi</param>
+    /// <param name="rd">rate of change of radius</param>
+    /// <returns>Position/velicity vectors as double[2,3].</returns>
+    public static double[,] S2pv(double theta, double phi, double r, double td, double pd, double rd) {
+        var pv = new double[2, 3] {{0, 0, 0}, {0, 0, 0}};
+        S_S2pv(theta, phi, r, td, pd, rd, pv);
+        return pv;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauS2pv", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_S2pv(double theta, double phi, double r,
+        double td, double pd, double rd, [In, Out] double[,] pv);
 
     
     /*######### VectorMatrix/VectorOps ###################################################################*/

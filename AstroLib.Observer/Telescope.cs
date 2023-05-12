@@ -17,16 +17,19 @@ public class Telescope {
     /// <summary> Focal length of the OTA including any focal reducer, in meters,
     /// e.g. 2.800 for OTA having f/8 mirror and 0.35 meter aperture.</summary>
     public double FocalLength { get; init; }
-    
+
     /// <summary>CONSTRUCTOR for normal case.</summary>
     /// <param name="mountModel">Name of the telescope mount, e.g., "PlaneWave L-500".</param>
     /// <param name="otaModel">Name of the Optical Tube Assembly (telescope optics proper),
     /// e.g., "Celestron C14".</param>
-    /// <param name="focalLength">Focal length of the OTA, in meters,
-    /// e.g., 350 for OTA having a 14-inch primary mirror.</param>
-    public Telescope(string mountModel, string otaModel, double focalLength) {
+    /// <param name="aperture">Aperture of the OTA, in meters,
+    /// e.g., 0.350 for OTA having a 14-inch primary mirror.</param>
+    /// <param name="focalLength">Focal length of the OTA including any focal reducer, in meters,
+    /// e.g. 2.800 for OTA having f/8 mirror and 0.35 meter aperture.</param>
+    public Telescope(string mountModel, string otaModel, double aperture, double focalLength) {
         MountModel = mountModel;
         OtaModel = otaModel;
+        Aperture = aperture;
         FocalLength = focalLength;
     }
 }
