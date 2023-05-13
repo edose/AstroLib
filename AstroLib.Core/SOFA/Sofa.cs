@@ -9,15 +9,28 @@ using AstroLib.Core.Utils;
 namespace AstroLib.Core.SOFA;
 
 /*########################################################################################################*/
-// Due diligence statement from the principal author of this class and its resulting assembly (.dll file):
-// This work (AstroLib.Sofa):
-// (i) calls routines and computations that I derived from software provided by SOFA under license; and
-// (ii) does not itself constitute software provided by and/or endorsed by SOFA.
-// (iii) calls *compiled* C-language functions from C-language source code provided by SOFA,
-//       but does not distribute that original source code. We offer instead a .NET-based API to SOFA
-//       functions, which API is especially suitable for calling from another user's own C#-language code.
+//
+// This (contents of AstroLib.Core.SOFA) is not a source distribution or derived work of the
+// IAU SOFA library. This is, rather, a set of our own methods that call SOFA functions.
+// No SOFA source code is included here, though some SOFA documentation excerpts and SOFA-consistent
+// parameter and struct naming is followed, to clarify use of AstroLib itself.
+//
 /*########################################################################################################*/
-//  Correspondence concerning SOFA software should be addressed as follows:
+//
+// Due diligence statement from the principal author of this class and its resulting assembly (.dll file):
+// This work (AstroLib.Core.SOFA):
+// (i) calls routines and computations that I derived by calling on but in no way reproducing software
+//       provided by SOFA under license;
+// (ii) does not itself constitute software provided by and/or endorsed by SOFA; and
+// (iii) calls *compiled* C-language functions from C-language source code provided by SOFA,
+//       but does not distribute that original source code.
+//       We offer instead our own .NET-based API to access SOFA functions.
+//       This new API is especially suitable for calling from another user's own C#-language code.
+//
+//       Eric Dose, Albuquerque, New Mexico USA 2023
+//
+/*########################################################################################################*/
+//  Correspondence concerning SOFA software proper should be addressed as follows:
 //
 //      By email:  sofa@ukho.gov.uk
 //      By post:   IAU SOFA Center
@@ -27,6 +40,9 @@ namespace AstroLib.Core.SOFA;
 //                 Somerset, TA1 2DN
 //                 United Kingdom
 /*########################################################################################################*/
+
+// Code regions in the following (e.g., "Astronomy/Calendars") group our AstroLib functions just as 
+// the SOFA website (http://iausofa.org/2021_0512_C/Astronomy.html) groups the SOFA functions we call.
 
 /// <summary>Class Sofa: Low-level .NET representations of selected IAU SOFA functions.</summary>
 public static class Sofa {
@@ -73,8 +89,11 @@ public static class Sofa {
         public double dl;     // Deflection limiter (radians^2/2)
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]  //  C++: double[2,3] pv
         public double[,] pv;  // Barycentric position/velocity of the light-deflecting body (AU, AU/day) 
-    }
+    } 
     
+    // Code regions in the following (e.g., "Astronomy/Calendars") group our AstroLib.Core.Sofa functions
+    // just as the SOFA website (http://iausofa.org/2021_0512_C/Astronomy.html) groups the
+    // SOFA functions that we call from our own.
     
 #region "Astronomy/Calendars"
     /*######### Astronomy/Calendars ######################################################################*/
@@ -83,8 +102,6 @@ public static class Sofa {
     //      iauEpb2jd Besselian Epoch to Julian Date.
     //      iauEpj    Julian Date to Julian Epoch.
     //      iauEpj2jd Julian Epoch to Julian Date.
-    //      iauJdcalf Julian Date to Gregorian Calendar, expressed in a form convenient
-    //                    for formatting messages: rounded to a specified precision.
     // .....................................................................................................
 
     /// <summary>Sofa.Cal2jd(): Gregorian Calendar to Julian Date.</summary>
@@ -114,7 +131,26 @@ public static class Sofa {
         return Tuple.Create(iy, im, id, fd); }
     [DllImport(DllFilename, EntryPoint = "iauJd2cal", CallingConvention = CallingConvention.Cdecl)]
     static extern double S_Jd2cal(double dj1, double dj2, 
-        ref int iy, ref int im, ref int id, ref double fd);    
+        ref int iy, ref int im, ref int id, ref double fd);
+
+
+    /// <summary>Sofa.Jdcalf(): Julian Date to Gregorian Calendar, expressed in a form convenient
+    /// for formatting messages: rounded to a specified precision.</summary>
+    /// <param name="ndp">Number of decimal places for days in fraction returned
+    /// (9 or less for 32-bit integers.).</param>
+    /// <param name="dj1">Part 1 of 2-part Julian Date</param>
+    /// <param name="dj2">Part 2 of 2-part Julian Date</param>
+    /// <returns>iymdf: int[4], where integers are year, month, day, and fractional representation to
+    /// specified precision.</returns>
+    public static int[] Jdcalf(int ndp, double dj1, double dj2) {
+        var iymdf = new Int32[4] {0, 0, 0, 0};
+        S_Jdcalf(ndp, dj1, dj2, ref iymdf);
+        return iymdf;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauJdcalf", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Jdcalf(int ndp, double dj1, double dj2, ref int[] iymdf);
+  
+    
 #endregion
     
 #region "Astronomy/Astrometry"    
@@ -402,9 +438,9 @@ public static class Sofa {
     /// <param name="px">Parallax (arcseconds).</param>
     /// <param name="rv">Radial valocity (km/s, positive for receding).</param>
     /// <param name="astrom">Star-independent astrometry parameters, as a iauASTROM struct generated
-    /// by another SOFA function..</param>
+    /// by another SOFA function.</param>
     /// <returns>2-tuple:  ra: ICRS astrometric Right Ascension (radians).
-    ///                    dec: ICRS astrometric Declination (radians).</returns>
+    ///                    da: ICRS astrometric Declination (radians).</returns>
     public static Tuple<double, double> Atccq(double rc, double dc, double pr, double pd, 
         double px, double rv, iauASTROM astrom) {
         double ra = 0, da = 0;
@@ -437,7 +473,55 @@ public static class Sofa {
         double date1, double date2, ref double ri, ref double di, ref double eo); 
     
     
+    /// <summary> Sofa.Atciq(): Quick ICRS (epoch J2000.0) to CIRS transformation, given precomputed
+    /// star−independent astrometry parameters.
+    ///
+    /// Use of this function is appropriate when efficiency is important and where many star positions
+    /// are to be transformed for one date. The star−independent parameters can be obtained by
+    /// calling one of the functions iauApci[13], iauApcg[13], iauApco[13] or iauApcs[13].
+    ///
+    /// If the parallax and proper motions are zero the iauAtciqz function can be used instead.</summary>
+    /// <param name="rc">ICRS Right Ascension (radians, J2000.0).</param>
+    /// <param name="dc">ICRS Declination (radians, J2000.0).</param>
+    /// <param name="pr">Proper motion in Right Ascension (radians/year).</param>
+    /// <param name="pd">Proper motion in Declination (radians/year).</param>
+    /// <param name="px">Parallax (arcseconds).</param>
+    /// <param name="rv">Radial velocity (km/s, receding is positive).</param>
+    /// <param name="astrom">Star-independent astrometry parameters, as a iauASTROM struct generated
+    /// by another SOFA function.</param>
+    /// <returns>2-tuple:  ri: CIRS astrometric Right Ascension (radians).
+    ///                    di: CIRS astrometric Declination (radians).</returns>
+    public static Tuple<double, double> Atciq(double rc, double dc, double pr, double pd, 
+        double px, double rv, iauASTROM astrom) {
+        double ri = 0, di = 0;
+        S_Atciq(rc, dc, pr, pd, px, rv, astrom, ref ri, ref di);
+        return Tuple.Create(ri, di); }
+    [DllImport(DllFilename, EntryPoint = "iauAtciq", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Atciq(double rc, double dc, double pr, double pd, double px, double rv,
+        iauASTROM astrom, ref double ri, ref double di);
     
+    
+    /// <summary> Sofa.Atciqz(): Quick ICRS (epoch J2000.0) to CIRS transformation, given precomputed
+    /// star−independent astrometry parameters, and assuming zero parallax and proper motion.
+    ///
+    /// Use of this function is appropriate when efficiency is important and where many star positions
+    /// are to be transformed for one date. The star−independent parameters can be obtained by
+    /// calling one of the functions iauApci[13], iauApcg[13], iauApco[13] or iauApcs[13].
+    ///
+    /// The corresponding function for the case of non−zero parallax and proper motion
+    /// is iauAtciq.</summary>
+    /// <param name="rc">ICRS Right Ascension (radians, J2000.0).</param>
+    /// <param name="dc">ICRS Declination (radians, J2000.0).</param>
+    /// <param name="astrom">Star-independent astrometry parameters, as a iauASTROM struct generated
+    /// by another SOFA function.</param>
+    /// <returns>2-tuple:  ri: CIRS astrometric Right Ascension (radians).
+    ///                    di: CIRS astrometric Declination (radians).</returns>
+    public static Tuple<double, double> Atciqz(double rc, double dc, iauASTROM astrom) {
+        double ri = 0, di = 0;
+        S_Atciqz(rc, dc, astrom, ref ri, ref di);
+        return Tuple.Create(ri, di); }
+    [DllImport(DllFilename, EntryPoint = "iauAtciqz", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Atciqz(double rc, double dc, iauASTROM astrom, ref double ri, ref double di);
     
     
     /// <summary>Sofa.Atco13(): ICRS RA,Dec to observed place. The caller supplies UTC,
@@ -496,6 +580,21 @@ public static class Sofa {
     static extern double S_Atic13(double ri, double di, double date1, double date2, 
         ref double rc, ref double dc, ref double eo); 
     
+
+    /// <summary>Sofa.Aticq(): Quick transform from CIRS RA,Dec to ICRS astrometric place,
+    /// given star-independent astrometry parameters.</summary>
+    /// <param name="ri">CIRS geocentric RA (radians)</param>
+    /// <param name="di">CIRS geocentric Dec (radians)</param>
+    /// <param name="astrom">Star-independent astrometry parameters, as a iauASTROM struct generated
+    /// by another SOFA function.</param>
+    /// <returns>2-tuple of doubles: rc, dc: RA, Dec (ICRS astrometric).</returns>
+    public static Tuple<double, double> Aticq(double ri, double di, iauASTROM astrom) {
+        double rc = 0, dc = 0;
+        S_Aticq(ri, di, astrom, ref rc, ref dc);
+        return Tuple.Create(rc, dc); }
+    [DllImport(DllFilename, EntryPoint = "iauAticq", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Aticq(double ri, double di, iauASTROM astrom, ref double rc, ref double dc); 
+    
     
     /// <summary>Sofa.Atio13(): Transform CIRS RA,Dec to observed place. The caller supplies UTC,
     ///                         site coordinates, ambient air conditions and observing wavelength.</summary>
@@ -529,6 +628,29 @@ public static class Sofa {
     static extern double S_Atio13(double ri, double di, double utc1, double utc2, 
         double dut1, double elong, double phi, double hm, double xp, double yp,
         double phpa, double tc, double rh, double wl,
+        ref double aob, ref double zob, ref double hob, ref double dob, ref double rob); 
+    
+    
+    /// <summary> Quick transform from CIRS to Observed place.
+    /// Use this function when efficiency is important and where many star positions are all
+    /// to be transformed for one date. The star−independent astrometry parameters can be obtained by
+    /// calling iauApio[13] or iauApco[13].</summary>
+    /// <param name="ri">CIRS Right Ascension (radians)</param>
+    /// <param name="di">CIRS Declination (radians)</param>
+    /// <param name="astrom">Star-independent astrometry parameters, as a iauASTROM struct generated
+    /// by another SOFA function.</param>
+    /// <returns>5-tuple of doubles: aob: observed azimuth (radians, N=0, E=pi/2),
+    ///                              zob: observed zenith distance (radians, zenith=0),
+    ///                              hob: observed hour angle (radians),
+    ///                              dob: observed declination (radians),
+    ///                              rob: observed right ascension (radians, CIO-based)</returns>
+    public static Tuple<double, double, double, double, double> Atioq(double ri, double di, 
+        iauASTROM astrom) {
+        double aob = 0, zob = 0, hob = 0, dob = 0, rob = 0;
+        S_Atioq(ri, di, astrom, ref aob, ref zob, ref hob, ref dob, ref rob);
+        return Tuple.Create(aob, zob, hob, dob, rob); }
+    [DllImport(DllFilename, EntryPoint = "iauAtioq", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Atioq(double ri, double di, iauASTROM astrom,  
         ref double aob, ref double zob, ref double hob, ref double dob, ref double rob); 
     
     
@@ -587,7 +709,7 @@ public static class Sofa {
     /// <param name="tc">Ambient temperature at the observer (degrees C).</param>
     /// <param name="rh">Relative humidity at the observer (in range [0-1]).</param>
     /// <param name="wl">Observation wavelength (micrometers).</param> 
-    /// <returns>2-tuple of doubles: ri, di: RA, Dec (radians, CIO-based).</returns>.
+    /// <returns>2-tuple of doubles: ri, di: RA, Dec (radians, CIRS, CIO-based).</returns>.
     public static Tuple<double, double> Atoi13(string type, double ob1, double ob2, double utc1, double utc2, 
         double dut1, double elong, double phi, double hm, double xp, double yp, 
         double phpa, double tc, double rh, double wl) {
@@ -599,6 +721,30 @@ public static class Sofa {
     static extern double S_Atoi13(ref string type, double ob1, double ob2, double utc1, double utc2, 
         double dut1, double elong, double phi, double hm, double xp, double yp, double phpa, double tc, 
         double rh, double wl, ref double ri, ref double di);
+    
+    
+    /// <summary> Quick transform from Observed place to CIRS, given the star-independent
+    /// astrometry parameters.
+    ///
+    /// Use this function when efficiency is important and where many star positions are all to be
+    /// transformed for one date. The star−independent astrometry parameters can be obtained by
+    /// calling iauApio[13] or iauApco[13].</summary>
+    /// <param name="type">type of coordinates (string of length one, case-insensitive):
+    ///                    "R" -> ob1=RA, ob2=Dec,
+    ///                    "H" -> ob1=Hour Angle, ob2=Dec,
+    ///                 or "A" -> ob1=Azimuth (N=0, E=90deg), ob2=zenith distance).</param>
+    /// <param name="ob1">observed RA, Hour Angle, or Azimuth (N=0, E+) (radians)</param>
+    /// <param name="ob2">observed Zenith Distance or Declination (radians)</param>
+    /// <param name="astrom">Star-independent astrometry parameters, as a iauASTROM struct generated
+    /// by another SOFA function.</param>
+    /// <returns>2-tuple of doubles: ri, di: RA, Dec (radians, CIRS, CIO-based).</returns>.
+    public static Tuple<double, double> Atoiq(string type, double ob1, double ob2, iauASTROM astrom) {
+        double ri = 0, di = 0;
+        S_Atoiq(ref type, ob1, ob2, astrom, ref ri, ref di);
+        return Tuple.Create(ri, di); }
+    [DllImport(DllFilename, EntryPoint = "iauAtoiq", CallingConvention = CallingConvention.Cdecl)]
+    static extern double S_Atoiq(ref string type, double ob1, double ob2, iauASTROM astrom, 
+        ref double ri, ref double di);
     
     
     /// <summary>Sofa.Pmsafe(): Star proper motion: update star catalog data for space motion, with
@@ -855,10 +1001,9 @@ public static class Sofa {
     //                    and the CIO locator s, using the IAU 2000A precession−nutation model.
     //      iauXys00b For a given TT date, compute the X,Y coordinates of the Celestial Intermediate Pole
     //                    and the CIO locator s, using the IAU 2000B precession−nutation model.
-    //      iauXys06a For a given TT date, compute the X,Y coordinates of the Celestial Intermediate Pole
-    //                    and the CIO locator s, using the IAU 2006 precession and
-    //                    IAU 2000A nutation models.
     // .....................................................................................................
+
+
 #endregion
     
 #region "Astronomy/RotationAndTime"
@@ -924,6 +1069,24 @@ public static class Sofa {
     [DllImport(DllFilename, EntryPoint = "iauGst06a", CallingConvention = CallingConvention.Cdecl)]
     static extern double S_Gst06a(double uta, double utb, double tta, double ttb);
 
+    
+    /// <summary>For a given TT date, compute the X,Y coordinates of the Celestial Intermediate Pole
+    /// and the CIO locator s, using the IAU 2006 precession and IAU 2000A nutation models.</summary>
+    /// <param name="date1">Part 1 of Julian Date, TT.</param>
+    /// <param name="date2">Part 2 of Julian Date, TT.</param>
+    /// <returns> 3-Tuple of doubles:
+    ///     x: Celestial Intermediate Pole
+    ///     y: Celestial Intermediate Pole
+    ///     s: the CIO locator s</returns>
+    public static Tuple<double, double, double> Xys06a(double date1, double date2) {
+        double x = 0, y = 0, s = 0;
+        S_Xys06a(date1, date2, ref x, ref y, ref s);
+        var result = Tuple.Create(x, y, s);
+        return result; }
+    [DllImport(DllFilename, EntryPoint = "iauXys06a", CallingConvention = CallingConvention.Cdecl)]
+    static extern void S_Xys06a(double date1, double date2, ref double x, ref double y, ref double s);
+    
+    
     #endregion    
     
 #region "Astronomy/SpaceMotion"
@@ -956,7 +1119,7 @@ public static class Sofa {
     
     /// <summary>Sofa.Starpm(): Star proper motion: update (for new time) star catalog data
     ///                         for space motion.
-    /// NB: not safe for zero parallax and/or radial velocity: for these, always use Sofa.Pmsafe().
+    /// NB: not safe for zero parallax and/or radial velocity; when in doubt, use Sofa.Pmsafe().
     /// </summary>
     /// <param name="ra1">Right Ascension, before (radians).</param>
     /// <param name="dec1">Declination, before (radians).</param>
@@ -996,7 +1159,6 @@ public static class Sofa {
     /*######### Astronomy/EclipticCoordinates ############################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib):
     //      
-    //      iauEcm06  ICRS equatorial to ecliptic rotation matrix, IAU 2006.
     //      iauLteceq Transformation from ecliptic coordinates (mean equinox and ecliptic of date)
     //                    to ICRS RA,Dec, using a long−term (ca. 40K year) precession model.
     //      iauLtecm  ICRS equatorial to ecliptic rotation matrix, long−term (ca. 40K year).
@@ -1021,6 +1183,19 @@ public static class Sofa {
     [DllImport(DllFilename, EntryPoint = "iauEceq06", CallingConvention = CallingConvention.Cdecl)]
     static extern int S_Eceq06(double date1, double date2, double dl, double db,
         ref double dr, ref double dd);
+
+
+    /// <summary> Generate rotation matrix, ICRS equatorial to Ecliptic, IAU 2006.</summary>
+    /// <param name="date1">TT as 2-part Julian date, part 1</param>
+    /// <param name="date2">TT as 2-part Julian date, part 2</param>
+    /// <returns>Rotation matrix, ICRS to Ecliptic (3x3 matrix of doubles)</returns>
+    public static double[,] Ecm06(double date1, double date2) {
+        var rm = new double[3, 3] {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        var status = S_Ecm06(date1, date2, rm);
+        return rm;
+    }
+    [DllImport(DllFilename, EntryPoint = "iauEcm06", CallingConvention = CallingConvention.Cdecl)]
+    static extern int S_Ecm06(double date1, double date2, [In, Out] double[,] rm);
     
     
     /// <summary>Sofa.Eqec06(): Transformation from ICRS equatorial coordinates to ecliptic coordinates
@@ -1126,13 +1301,8 @@ public static class Sofa {
 #region "Astronomy/Timescales"
     /*######### Astronomy/Timescales #####################################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib):
-    //      iauD2tf   Decompose days to hours, minutes, seconds, fraction.
     //      iauDtdb   Time scale transformation:  Barycentric Dynamical Time, TDB, to Terrestrial Time, TT.
     //                     (Unclear or erroneous documentation on param "dtr") (~2 millisecond difference).
-    //      iauTdbtt  Time scale transformation: Barycentric Dynamical Time, TDB, to Terrestrial Time, TT.
-    //                    (Unclear or erroneous documentation on param "dtr") (~2 millisecond difference).
-    //      iauTttdb  Time scale transformation: Terrestrial Time, TT, to Barycentric Dynamical Time, TDB.
-    //                    (Unclear or erroneous documentation on param "dtr") (~2 millisecond difference).
     // .....................................................................................................
     
     
@@ -1351,13 +1521,30 @@ public static class Sofa {
     [DllImport(DllFilename, EntryPoint = "iauTdbtcb", CallingConvention = CallingConvention.Cdecl)]
     static extern int S_Tdbtcb(double tdb1, double tdb2, ref double tcb1, ref double tcb2);
 
+    
+    /// <summary> Time scale transformation: TDB (Barycentric Dynamical Time) to TT (Terrestrial Time).
+    /// TDB is essentially the same as Teph, the time argument for the JPL solar system ephemerides.
+    /// </summary>
+    /// <param name="tdb1">Part 1 of 2-part Julian Date, TDB.</param>
+    /// <param name="tdb2">Part 2 of 2-part Julian Date, TDB.</param>
+    /// <param name="dtr">TDB-TT (seconds). Dominated by annual term of 1.7 milliseconds amplitude.</param>
+    /// <returns>2-Tuple of doubles: tt1: Part 1 of 2-part Julian Date, TT
+    ///                              tt2: Part 2 of 2-part Julian Date, TT.</returns>
+    public static Tuple<double, double> Tdbtt(double tdb1, double tdb2, double dtr) {
+        double tt1 = 0, tt2 = 0;
+        var status = S_Tdbtt(tdb1, tdb2, dtr, ref tt1, ref tt2);
+        return Tuple.Create(tt1, tt2); }
+    [DllImport(DllFilename, EntryPoint = "iauTdbtt", CallingConvention = CallingConvention.Cdecl)]
+    static extern int S_Tdbtt(double tdb1, double tdb2, double dtr, ref double tt1, ref double tt2);
+    
+    
             
     /// <summary>Sofa.Tttai(): Time scale transformation: Terrestrial Time, TT,
     ///                        to International Atomic Time, TAI.</summary>
-    /// <param name="tt1">Part 1 of 2-part Julian Date, TT.</param>
-    /// <param name="tt2">Part 2 of 2-part Julian Date, TT.</param>
+    /// <param name="tt1">Part 1 of 2-part Julian Date, TT</param>
+    /// <param name="tt2">Part 2 of 2-part Julian Date, TT</param>
     /// <returns>2-Tuple of doubles: tai1: Part 1 of 2-part Julian Date, TAI
-    ///                              tai2: Part 2 of 2-part Julian Date, TAI.</returns>
+    ///                              tai2: Part 2 of 2-part Julian Date, TAI</returns>
     public static Tuple<double, double> Tttai(double tt1, double tt2) {
         double tai1 = 0, tai2 = 0;
         var status = S_Tttai(tt1, tt2, ref tai1, ref tai2);
@@ -1368,10 +1555,10 @@ public static class Sofa {
             
     /// <summary>Sofa.Tttcg(): Time scale transformation: Terrestrial Time, TT,
     ///                        to Geocentric Coordinate Time, TCG.</summary>
-    /// <param name="tt1">Part 1 of 2-part Julian Date, TT.</param>
-    /// <param name="tt2">Part 2 of 2-part Julian Date, TT.</param>
+    /// <param name="tt1">Part 1 of 2-part Julian Date, TT</param>
+    /// <param name="tt2">Part 2 of 2-part Julian Date, TT</param>
     /// <returns>2-Tuple of doubles: tcg1: Part 1 of 2-part Julian Date, TCG
-    ///                              tcg2: Part 2 of 2-part Julian Date, TCG.</returns>
+    ///                              tcg2: Part 2 of 2-part Julian Date, TCG</returns>
     public static Tuple<double, double> Tttcg(double tt1, double tt2) {
         double tcg1 = 0, tcg2 = 0;
         var status = S_Tttcg(tt1, tt2, ref tcg1, ref tcg2);
@@ -1379,6 +1566,21 @@ public static class Sofa {
     [DllImport(DllFilename, EntryPoint = "iauTttcg", CallingConvention = CallingConvention.Cdecl)]
     static extern int S_Tttcg(double tt1, double tt2, ref double tcg1, ref double tcg2);
 
+
+    /// <summary>Time scale transformation: Terrestrial Time, TT,
+    /// to Barycentric Dynamical Time, TDB.</summary>
+    /// <param name="tt1">Part 1 of 2-part Julian Date, TT</param>
+    /// <param name="tt2">Part 2 of 2-part Julian Date, TT</param>
+    /// <param name="dtr">TDB-TT (seconds). Dominated by annual term of 1.7 milliseconds amplitude.</param>
+    /// <returns>2-Tuple of doubles: tdb1: Part 1 of 2-part Julian Date, TDB
+    ///                              tdb2: Part 2 of 2-part Julian Date, TDB</returns>
+    public static Tuple<double, double> Tttdb(double tt1, double tt2, double dtr) {
+        double tdb1 = 0, tdb2 = 0;
+        var status = S_Tttdb(tt1, tt2, dtr, ref tdb1, ref tdb2);
+        return Tuple.Create(tdb1, tdb2); }
+    [DllImport(DllFilename, EntryPoint = "iauTttdb", CallingConvention = CallingConvention.Cdecl)]
+    static extern int S_Tttdb(double tt1, double tt2, double dtr, ref double tdb1, ref double tdb2);
+    
     
     /// <summary>Sofa.Ttut1(): Time scale transformation: Terrestrial Time, TT,
     ///                        to Universal Time, UT1.</summary>
@@ -1512,8 +1714,6 @@ public static class Sofa {
 #region "Astronomy/Gnomonic"
     /*######### Astronomy/Gnomonic ######################################################################*/
     // No need to expose as public *for now* (reproduce these as needed, in C# within AstroLib.Geometry):
-    //      iauTpors  In the tangent plane projection, given the rectangular coordinates of a star and its
-    //                    spherical coordinates, determine the spherical coordinates of the tangent point.
     //      iauTporv  In the tangent plane projection, given the rectangular coordinates of a star and its
     //                    direction cosines, determine the direction cosines of the tangent point.
     //      iauTpstv  In the tangent plane projection, given the star’s rectangular coordinates and the
@@ -1524,6 +1724,26 @@ public static class Sofa {
     //                    in the tangent plane.
     // .....................................................................................................
 
+    
+    /// <summary> In the tangent plane (gnomonic) projection, given the rectangular coordinates of a star
+    /// and its spherical coordinates, determine the spherical coordinates of the tangent point.</summary>
+    /// <param name="xi">Rectangular coordinates of star image (radians)</param>
+    /// <param name="eta">Rectangular coordinates of star image (radians)</param>
+    /// <param name="a">Star's spherical coordinates (radians)</param>
+    /// <param name="b">Star's spherical coordinates (radians)</param>
+    /// <returns>4-tuple of doubles:
+    ///              a01: Tangent point's spherical coordinates (radians), solution 1
+    ///              b01: Tangent point's spherical coordinates (radians), solution 1
+    ///              a02: Tangent point's spherical coordinates (radians), solution 2.
+    ///              b02: Tangent point's spherical coordinates (radians), solution 2.</returns>.
+    public static Tuple<double, double, double, double> Tpors(double xi, double eta, double a, double b) {
+        double a01 = 0, b01 = 0, a02 = 0, b02 = 0;
+        S_Tpors(xi, eta, a, b, ref a01, ref b01, ref a02, ref b02);
+        return Tuple.Create(a01, b01, a02, b02); }
+    [DllImport(DllFilename, EntryPoint = "iauTpors", CallingConvention = CallingConvention.Cdecl)]
+    static extern int S_Tpors(double xi, double eta, double a, double b, 
+        ref double a01, ref double b01, ref double a02, ref double b02);
+    
     
     /// <summary>Sofa.Tpsts(): In the tangent plane projection, given the star’s rectangular coordinates
     ///                        and the spherical coordinates of the tangent point, solve for the
@@ -1546,10 +1766,10 @@ public static class Sofa {
     /// <summary>Sofa.Tpxes(): In the tangent plane projection, given celestial spherical coordinates for
     ///                        a star and the tangent point, solve for the star’s rectangular coordinates
     ///                        in the tangent plane.</summary>
-    /// <param name="a">Star's spherical coordinates (radians).</param>
-    /// <param name="b">Star's spherical coordinates (radians).</param>
-    /// <param name="a0">Tangent point's spherical coordinates (radians).</param>
-    /// <param name="b0">Tangent point's spherical coordinates (radians).</param>
+    /// <param name="a">Star's spherical coordinates (radians)</param>
+    /// <param name="b">Star's spherical coordinates (radians)</param>
+    /// <param name="a0">Tangent point's spherical coordinates (radians)</param>
+    /// <param name="b0">Tangent point's spherical coordinates (radians)</param>
     /// <returns>2-tuple of doubles:
     ///                       xi:  Rectangular coordinates of star image (radians at tangent point).
     ///                       eta: Rectangular coordinates of star image, due North (radians at tangent pt).
