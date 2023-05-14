@@ -201,8 +201,6 @@ public sealed class Declination : Angle {
     }
 }
 
-// TODO: Longitude and RightAscension need to *wrap* input angles, not to clamp them.
-
 /// <summary>Represents a RightAscension, the sky analog to terrestrial Longitude, and generally
 /// expressed in hours within [0, 24).</summary>
 public sealed class RightAscension : Angle {
