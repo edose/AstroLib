@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="DefunctTests\" />
       <Folder Include="SofaTests\obj\" />
     </ItemGroup>
 

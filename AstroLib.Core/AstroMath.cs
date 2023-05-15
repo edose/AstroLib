@@ -92,5 +92,25 @@ public static class AstroMath {
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public static bool IsInRange(double trialInput, double? rangeMin, double? rangeMax) {
         return (AstroMath.Clamp(trialInput, rangeMin, rangeMax) == trialInput);
-    }    
+    }
+
+    /// <summary> Return new 2-dimensional array of doubles from 1-dimensional array
+    /// (without changing memory layout or total number of elements).</summary>
+    /// <param name="array1d">One-dimensional array supplying values</param>
+    /// <param name="size1">length of 2-D array in first index</param>
+    /// <param name="size2">length of 2-D array in second index</param>
+    /// <returns>2-Dimensional array of doubles</returns>
+    /// <exception cref="ArgumentException">Thrown if size1*size2 != array1d.Length</exception>
+    public static double[,] Reshape1dTo2dArray(double[] array1d, int size1, int size2) {
+        if (array1d.Length != size1 * size2) {
+            throw new ArgumentException("array1d.Length must equal size1 * size2 but does not.");
+        }
+        var array2d = new double[size1, size2];
+        for (int i = 0; i < size1 * size2; ++i) {
+            array2d[i / size2, i % size2] = array1d[i];
+        }
+        return array2d;
+    }
+    
+    
 }

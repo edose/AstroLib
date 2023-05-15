@@ -11,9 +11,9 @@ using NUnit.Framework;
 
 namespace AstroLibTests.SofaTests;
 
-[TestFixture]
+// [TestFixture]
 [SuppressMessage("Assertion", "NUnit2045:Use Assert.Multiple")]
-public class SofaTests {
+public class _OldSofaTests {
     private static double DegreesAsRadians(double deg) { return deg * (Math.PI / 180.0); }
 
     private static double HoursAsRadians(double hours) { return (hours * 15.0) * (Math.PI / 180.0); }

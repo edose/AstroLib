@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using AstroLib.Core.Utils;
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
@@ -46,7 +48,7 @@ namespace AstroLib.Core.SOFA;
 
 /// <summary>Class Sofa: Low-level .NET representations of many, but not all, IAU SOFA functions.
 /// Contains functions from both the SOFA Astronomy and SOFA Vector/Matrix libraries. </summary>
-public static class Sofa {
+public static partial class Sofa {
     private const string DllDirectory = "C:/DevCS/SOFA_dll/x64/Release";
     private const string DllFilename = "SOFA_dll.dll";
 
@@ -56,53 +58,7 @@ public static class Sofa {
     }
 
 
-    #region "Structs"
-    /// <summary> Star-independent astrometry parameters, as a C++ struct.
-    /// Vectors eb, eh, em, and v: with respect to axes of the BCRS (barycentric celestial ref. system).
-    /// As defined in SOFA's sofa.h source file.</summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct iauASTROM {
-        public double pmt; // Proper motion time interval (Solar system barycenter, Julian years)
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] // C++: double[3] eb
-        public double[] eb; // Solar system barycenter to observer (vector, AU)
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] // C++: double[3] eh
-        public double[] eh; // Sun to observer (unit vector)
-
-        public double em; // Distance from sun to observer (AU)
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] // C++: double[3] v
-        public double[] v; // Barycentric observer velocity (vector, units of c)
-
-        public double bm1; // Reciprocal of Lorenz factor, i.e., sqrt(1-|v|^2)
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 9)] // C++: double[3,3] bpn
-        public double[,] bpn; // Bias-precession-nutation matrix
-
-        public double along; // Longitude + s' + dETA(DUT) (radians)
-        public double xp1; // Polar motion xp, with respect to local meridian (radians)
-        public double yp1; // Polar motion yp, with respect to local meridian (radians)
-        public double sphi; // Sine of geodetic latitude
-        public double cphi; // Cosine of geodetic latitude
-        public double diurab; // Magnitude of diurnal aberration vector
-        public double era1; // "local" Earth rotation angle (radians)
-        public double refa; // Refraction constant A (radians)
-        public double refb; // Refraction constant B (radians)
-    }
-
-    /// <summary> Body parameters for light deflection.
-    /// As defined in SOFA's sofa.h source file.</summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct iauLDBODY {
-        public double bm; // Mass of the light-deflecting body (solar masses)
-        public double dl; // Deflection limiter (radians^2/2)
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)] //  C++: double[2,3] pv
-        public double[,] pv; // Barycentric position/velocity of the light-deflecting body (AU, AU/day) 
-    }
-
-    #endregion // "Structs"
     
     // *****************************************************************************************************
     // Code regions in the following (e.g., "Astronomy: Calendars") group our AstroLib.Core.Sofa functions
@@ -158,10 +114,10 @@ public static class Sofa {
     /// TT maybe used without significant loss of accuracy.</param>
     /// <returns>Star−independent astrometry parameters, as a iauASTROM struct.
     /// Unchanged struct elements: along, xp1, yp1, sphi, cphi, diurab, era1, refa, refb.</returns>
-    public static iauASTROM Apcg13(double date1, double date2) {
+    public static csharpASTROM Apcg13(double date1, double date2) {
         var astrom = new iauASTROM();
         S_Apcg13(date1, date2, ref astrom);
-        return astrom; }
+        return TranslateToCsharp(astrom); }
     [DllImport(DllFilename, EntryPoint = "iauApcg13", CallingConvention = CallingConvention.Cdecl)]
     static extern void S_Apcg13(double date1, double date2, ref iauASTROM astrom);
 
@@ -896,7 +852,7 @@ public static class Sofa {
     ///                                  -1 -> bad year
     ///                                  -2 -> bad month
     ///                                  -3 -> bad day
-    ///                                  -4 -> bad fraction of day (<0 or >1)
+    ///                                  -4 -> bad fraction of day, not in [0,1]
     ///                                  -5 -> internal error (rare)
     ///                    deltat: TAI minus UTC (seconds)</returns>
     //
@@ -1100,10 +1056,10 @@ public static class Sofa {
     /// <returns>3-Tuple:  status [int]: 0 -> OK
     ///                    tai1: Part 1 of 2-part Julian Date, TAI
     ///                    tai2: Part 2 of 2-part Julian Date, TAI.</returns>
-    public static Tuple<double, double> Tttai(double tt1, double tt2) {
+    public static Tuple<int, double, double> Tttai(double tt1, double tt2) {
         double tai1 = 0, tai2 = 0;
         var status = S_Tttai(tt1, tt2, ref tai1, ref tai2);
-        return Tuple.Create(tai1, tai2); }
+        return Tuple.Create(status, tai1, tai2); }
     [DllImport(DllFilename, EntryPoint = "iauTttai", CallingConvention = CallingConvention.Cdecl)]
     static extern int S_Tttai(double tt1, double tt2, ref double tai1, ref double tai2);
 
@@ -1513,7 +1469,7 @@ public static class Sofa {
     /// unit vector (direction cosines) of the star.</summary>
     /// <param name="xi">Rectangular coordinates of star image (radians at tangent point)</param>
     /// <param name="eta">Rectangular coordinates of star image, due North (radians @ tangent pt)</param>
-    /// <param name="v0">Tangent point's unit vector (direction cosines)/param>
+    /// <param name="v0">Tangent point's unit vector (direction cosines)</param>
     /// <returns>Star's unit vector (direction cosines)</returns>
     public static double[] Tpstv(double xi, double eta, double[] v0) {
         var v  = new double[3] {0, 0, 0};

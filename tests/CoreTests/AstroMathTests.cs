@@ -117,6 +117,15 @@ public class AstroMathTests {
         Assert.That(AstroMath.IsInRange(110, null, null), Is.True);
     }
 
-
-
+    [Test]
+    public void Render1dTo2dArrayTests() {
+        var array1d = new double[6] {3, 2, 6, 5, 9, 8};
+        var array2d = AstroMath.Reshape1dTo2dArray(array1d, 2, 3);
+        var array2dExpected = new double[,] {{3, 2, 6}, {5, 9, 8} };
+        Assert.That(array2d, Is.EqualTo(array2dExpected));
+        
+        // Test throwing exception for mismatched sizes:
+        Assert.That(() => AstroMath.Reshape1dTo2dArray(array1d, 2, 2), 
+            Throws.TypeOf<ArgumentException>());
+    }
 }
