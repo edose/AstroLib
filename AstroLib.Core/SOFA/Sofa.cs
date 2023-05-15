@@ -114,10 +114,10 @@ public static partial class Sofa {
     /// TT maybe used without significant loss of accuracy.</param>
     /// <returns>Star−independent astrometry parameters, as a iauASTROM struct.
     /// Unchanged struct elements: along, xp1, yp1, sphi, cphi, diurab, era1, refa, refb.</returns>
-    public static csharpASTROM Apcg13(double date1, double date2) {
+    public static iauASTROM Apcg13(double date1, double date2) {
         var astrom = new iauASTROM();
         S_Apcg13(date1, date2, ref astrom);
-        return TranslateToCsharp(astrom); }
+        return astrom; }
     [DllImport(DllFilename, EntryPoint = "iauApcg13", CallingConvention = CallingConvention.Cdecl)]
     static extern void S_Apcg13(double date1, double date2, ref iauASTROM astrom);
 
@@ -174,15 +174,15 @@ public static partial class Sofa {
     ///             Unchanged struct elements: along, xp1, yp1, sphi, cphi, diurab, era1, refa, refb.
     ///     eo: [double] Equation of the origins (i.e., ERA-GST)</returns>
     public static Tuple<int, iauASTROM, double> Apco13(double utc1, double utc2, double dut1, double elong,
-        double phi, double hm, double xp, double yp, double phpa, double tc, double rh, double w1) {
+        double phi, double hm, double xp, double yp, double phpa, double tc, double rh, double wl) {
         var astrom = new iauASTROM();
         double eo = 0;
-        var status = S_Apco13(utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, 
+        var status = S_Apco13(utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, wl, 
             ref astrom, ref eo);
         return Tuple.Create(status, astrom, eo); }
     [DllImport(DllFilename, EntryPoint = "iauApco13", CallingConvention = CallingConvention.Cdecl)]
     static extern int S_Apco13(double utc1, double utc2, double dut1, double elong, 
-        double phi, double hm, double xp, double yp, double phpa, double tc, double rh, double w1, 
+        double phi, double hm, double xp, double yp, double phpa, double tc, double rh, double wl, 
         ref iauASTROM astrom, ref double eo);
 
     // Apcs():  NOT IMPLEMENTED: earth ephemeris must be supplied by caller, so prefer Apcs13(). 
@@ -249,19 +249,19 @@ public static partial class Sofa {
     /// 1013.25 * exp(-hm / (29.3 * tsl)) where tsl is approx. sea-level temperature Kelvin.</param>
     /// <param name="tc">Ambient temperature at the observer (deg C)</param>
     /// <param name="rh">Relative humidity at the observer (range 0-1)</param>
-    /// <param name="w1">Wavelength of observation (micrometers)</param>
+    /// <param name="wl">Wavelength of observation (micrometers)</param>
     /// <returns> 2-Tuple:
     ///         status: [int] +1 -> dubious year; 0 -> OK; -1 -> unacceptable date.
     ///         astrom: Star−independent astrometry parameters, as a iauASTROM struct.
     ///                 Struct elements unchanged: pmt, eb, eh, em, v, bm1, bpn.</returns>
     public static Tuple<int, iauASTROM> Apio13(double utc1, double utc2, double dut1, double elong,
-        double phi, double hm, double xp, double yp, double phpa, double tc, double rh, double w1) {
+        double phi, double hm, double xp, double yp, double phpa, double tc, double rh, double wl) {
         var astrom = new iauASTROM();
-        var status = S_Apio13(utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, ref astrom);
+        var status = S_Apio13(utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, wl, ref astrom);
         return Tuple.Create(status, astrom); }
     [DllImport(DllFilename, EntryPoint = "iauApio13", CallingConvention = CallingConvention.Cdecl)]
     static extern int S_Apio13(double utc1, double utc2, double dut1, double elong, double phi, double hm,
-        double xp, double yp, double phpa, double tc, double rh, double w1, ref iauASTROM astrom);
+        double xp, double yp, double phpa, double tc, double rh, double wl, ref iauASTROM astrom);
 
     /// <summary>Sofa.Atcc13(): Transform a star’s ICRS catalog entry (epoch J2000.0) into ICRS
     /// astrometric place (update J2000.0 RA,Dec to datetime other than 2000.0).
@@ -576,11 +576,11 @@ public static partial class Sofa {
         double utc1, double utc2, double dut1, double elong, double phi, double hm, double xp, double yp,
         double phpa, double tc, double rh, double wl) {
         double ri = 0, di = 0;
-        var status = S_Atoi13(ref type, ob1, ob2, utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, 
+        var status = S_Atoi13(type, ob1, ob2, utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, 
             tc, rh, wl, ref ri, ref di);
         return Tuple.Create(status, ri, di); }
     [DllImport(DllFilename, EntryPoint = "iauAtoi13", CallingConvention = CallingConvention.Cdecl)]
-    static extern int S_Atoi13(ref string type, double ob1, double ob2, double utc1, double utc2,
+    static extern int S_Atoi13(string type, double ob1, double ob2, double utc1, double utc2,
         double dut1, double elong, double phi, double hm, double xp, double yp, double phpa, double tc,
         double rh, double wl, ref double ri, ref double di);
     
@@ -776,10 +776,10 @@ public static partial class Sofa {
     /// specified precision.</returns>
     public static Tuple<int, int[]> Jdcalf(int ndp, double dj1, double dj2) {
         var iymdf = new int[4] {0, 0, 0, 0};
-        var status = S_Jdcalf(ndp, dj1, dj2, ref iymdf);
+        var status = S_Jdcalf(ndp, dj1, dj2, iymdf);
         return Tuple.Create(status, iymdf); }
     [DllImport(DllFilename, EntryPoint = "iauJdcalf", CallingConvention = CallingConvention.Cdecl)]
-    static extern int S_Jdcalf(int ndp, double dj1, double dj2, ref int[] iymdf);
+    static extern int S_Jdcalf(int ndp, double dj1, double dj2, [In, Out] int[] iymdf);
 
     // Epb():      NOT IMPLEMENTED: Besselian Epoch of low relevance to amateur astronomy.
     // Epj():      NOT IMPLEMENTED: Julian Epoch of low relevance to amateur astronomy.

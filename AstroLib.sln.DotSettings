@@ -2,6 +2,7 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantExplicitArraySize/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Arcminutes/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Arcseconds/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Astrom/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=astrometric/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Astrometry/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Celestron/@EntryIndexedValue">True</s:Boolean>

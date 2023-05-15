@@ -31,27 +31,34 @@ public static partial class Sofa {
         public double[] v; // Barycentric observer velocity (vector, units of c)
 
         public double bm1; // Reciprocal of Lorenz factor, i.e., sqrt(1-|v|^2)
-
-        // [MarshalAs(UnmanagedType.ByValArray, SizeConst = 9)] // C++: double[3,3] bpn 2-dim as in SOFA
-        // public double[,] bpn; // Bias-precession-nutation matrix
         
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 9)] // C++: double[9] bpn 1-dimensional
         public double[] bpn; // Bias-precession-nutation matrix
 
         public double along; // Longitude + s' + dETA(DUT) (radians)
-        public double xp1; // Polar motion xp, with respect to local meridian (radians)
-        public double yp1; // Polar motion yp, with respect to local meridian (radians)
+        public double phi; // Geodetic latitude (radians)
+        public double xpl; // Polar motion xp, with respect to local meridian (radians)
+        public double ypl; // Polar motion yp, with respect to local meridian (radians)
         public double sphi; // Sine of geodetic latitude
         public double cphi; // Cosine of geodetic latitude
         public double diurab; // Magnitude of diurnal aberration vector
-        public double era1; // "local" Earth rotation angle (radians)
+        public double eral; // "local" Earth rotation angle (radians)
         public double refa; // Refraction constant A (radians)
         public double refb; // Refraction constant B (radians)
-    }
 
+        /// <summary>DEFAULT CONSTRUCTOR, to initialize arrays so that they are not null.</summary>
+        public iauASTROM() {
+            eb = new double[3] {0, 0, 0};
+            eh = new double[3] {0, 0, 0};
+            v = new double[3] {0, 0, 0};
+            bpn = new double[9] {0, 0, 0, 0, 0, 0, 0, 0, 0};
+        }
+    }
+    
     /// <summary> Star-independent astrometry parameters, as a C#/.NET struct.
-    /// This is the form exposed to C#, including multidimensional arrays recast from iauASTROM struct's
-    /// one-dimensional (C++) arrays.
+    /// This is the form readable by C#, including a multidimensional array (.bpn) recast from
+    /// iauASTROM struct's one-dimensional (C++) array (also .bpn). Required because of C#'s 
+    /// inadequate marshaling to C++ code (cannot properly marshal multidimensional arrays).
     /// 
     /// Vectors eb, eh, em, and v: with respect to axes of the BCRS (barycentric celestial ref. system).
     /// As defined in SOFA's sofa.h source file.</summary>
@@ -65,37 +72,39 @@ public static partial class Sofa {
         public double bm1; // Reciprocal of Lorenz factor, i.e., sqrt(1-|v|^2)
         public double[,] bpn; // Bias-precession-nutation matrix  *** THIS IS RECAST FROM C++ one-dim.
         public double along; // Longitude + s' + dETA(DUT) (radians)
-        public double xp1; // Polar motion xp, with respect to local meridian (radians)
-        public double yp1; // Polar motion yp, with respect to local meridian (radians)
+        public double phi; // Geodetic latitude (radians)
+        public double xpl; // Polar motion xp, with respect to local meridian (radians)
+        public double ypl; // Polar motion yp, with respect to local meridian (radians)
         public double sphi; // Sine of geodetic latitude
         public double cphi; // Cosine of geodetic latitude
         public double diurab; // Magnitude of diurnal aberration vector
-        public double era1; // "local" Earth rotation angle (radians)
+        public double eral; // "local" Earth rotation angle (radians)
         public double refa; // Refraction constant A (radians)
         public double refb; // Refraction constant B (radians)
     }
 
     public static csharpASTROM TranslateToCsharp(iauASTROM cpp) {
         var csharp = new csharpASTROM();
-        csharp.pmt = cpp.pmt;
+        csharp.pmt    = cpp.pmt;
         csharp.eb = new double[3];
         Array.Copy(cpp.eb, csharp.eb, cpp.eb.Length);
         csharp.eh = new double[3];
         Array.Copy(cpp.eh, csharp.eh, cpp.eh.Length);
-        csharp.em = cpp.em;
-        csharp.v = new double[3];
+        csharp.em     = cpp.em;
+        csharp.v      = new double[3];
         Array.Copy(cpp.v, csharp.v, cpp.v.Length);
-        csharp.bm1 = cpp.bm1;
-        csharp.bpn = AstroMath.Reshape1dTo2dArray(cpp.bpn, 3, 3);
-        csharp.along = cpp.along;
-        csharp.xp1 = cpp.xp1;
-        csharp.yp1 = cpp.yp1;
-        csharp.sphi = cpp.sphi;
-        csharp.cphi = cpp.cphi;
+        csharp.bm1    = cpp.bm1;
+        csharp.bpn    = AstroMath.Reshape1dTo2dArray(cpp.bpn, 3, 3);
+        csharp.along  = cpp.along;
+        csharp.phi    = cpp.phi;
+        csharp.xpl    = cpp.xpl;
+        csharp.ypl    = cpp.ypl;
+        csharp.sphi   = cpp.sphi;
+        csharp.cphi   = cpp.cphi;
         csharp.diurab = cpp.diurab;
-        csharp.era1 = cpp.era1;
-        csharp.refa = cpp.refa;
-        csharp.refb = cpp.refb;
+        csharp.eral   = cpp.eral;
+        csharp.refa   = cpp.refa;
+        csharp.refb   = cpp.refb;
         return csharp;
     }
     

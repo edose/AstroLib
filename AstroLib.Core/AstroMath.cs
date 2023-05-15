@@ -111,6 +111,41 @@ public static class AstroMath {
         }
         return array2d;
     }
-    
+
+    /// <summary> Return a transposed square matrix of doubles.</summary>
+    /// <param name="original">The original matrix</param>
+    /// <returns>Transposed matrix of same size</returns>
+    /// <exception cref="ArgumentException">Thrown if matrix is not square.</exception>
+    public static double[,] TransposeSquareMatrix(double[,] original) {
+        if (original.GetLength(0) != original.GetLength(1)) {
+            throw new ArgumentException("Original matrix must be square but is not.");
+        }
+        var size = original.GetLength(0);
+        var transposed = new double[size, size];
+        for (int irow = 0; irow < size; irow++) {
+            for (int icol = 0; icol < size; icol++) {
+                transposed[irow, icol] = original[icol, irow];
+            }
+        }
+        return transposed;
+    }
+
+    /// <summary> Flatten a 2-dimensional array of doubles to a 1-dimensional array, and return it.
+    /// The 1-dimensional result will have the same memory layout as the
+    /// 2-dimensional input array.</summary>
+    /// <param name="array2D">The array to flatten</param>
+    /// <returns>The flattened 1-dimensional array</returns>
+    public static double[] Flatten2DimArray(double[,] array2D) {
+        var nrow = array2D.GetLength(0);
+        var ncol = array2D.GetLength(1);
+        var result = new double[nrow * ncol];
+        var resultIndex = 0;
+        for (int irow = 0; irow < nrow; irow++) {
+            for (int icol = 0; icol < ncol; icol++) {
+                result[resultIndex++] = array2D[irow, icol];
+            }
+        }
+        return result;
+    }
     
 }

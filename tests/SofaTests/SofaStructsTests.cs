@@ -19,12 +19,13 @@ public class SofaStructsTests {
             bm1 = 61,
             bpn = new double[9] {70, 71, 72, 73, 74, 75, 76, 77, 78},
             along = 81,
-            xp1 = 91,
-            yp1 = 101,
+            phi = 87,
+            xpl = 91,
+            ypl = 101,
             sphi = 111,
             cphi = 121,
             diurab = 131,
-            era1 = 141,
+            eral = 141,
             refa = 151,
             refb = 161
         };
@@ -36,12 +37,13 @@ public class SofaStructsTests {
         Assert.That(iau.bm1, Is.EqualTo(61));
         Assert.That(iau.bpn, Is.EqualTo(new double[9] {70, 71, 72, 73, 74, 75, 76, 77, 78}));
         Assert.That(iau.along, Is.EqualTo(81));
-        Assert.That(iau.xp1, Is.EqualTo(91));
-        Assert.That(iau.yp1, Is.EqualTo(101));
+        Assert.That(iau.phi, Is.EqualTo(87));
+        Assert.That(iau.xpl, Is.EqualTo(91));
+        Assert.That(iau.ypl, Is.EqualTo(101));
         Assert.That(iau.sphi, Is.EqualTo(111));
         Assert.That(iau.cphi, Is.EqualTo(121));
         Assert.That(iau.diurab, Is.EqualTo(131));
-        Assert.That(iau.era1, Is.EqualTo(141));
+        Assert.That(iau.eral, Is.EqualTo(141));
         Assert.That(iau.refa, Is.EqualTo(151));
         Assert.That(iau.refb, Is.EqualTo(161));
     }
@@ -57,12 +59,13 @@ public class SofaStructsTests {
             bm1 = 61,
             bpn = new double[9] {70, 71, 72, 73, 74, 75, 76, 77, 78},
             along = 81,
-            xp1 = 91,
-            yp1 = 101,
+            phi = 87,
+            xpl = 91,
+            ypl = 101,
             sphi = 111,
             cphi = 121,
             diurab = 131,
-            era1 = 141,
+            eral = 141,
             refa = 151,
             refb = 161
         };
@@ -75,12 +78,13 @@ public class SofaStructsTests {
         Assert.That(csharp.bm1, Is.EqualTo(61));
         Assert.That(csharp.bpn, Is.EqualTo(new double[3,3] {{70, 71, 72}, {73, 74, 75}, {76, 77, 78}}));
         Assert.That(csharp.along, Is.EqualTo(81));
-        Assert.That(csharp.xp1, Is.EqualTo(91));
-        Assert.That(csharp.yp1, Is.EqualTo(101));
+        Assert.That(csharp.phi, Is.EqualTo(87));
+        Assert.That(csharp.xpl, Is.EqualTo(91));
+        Assert.That(csharp.ypl, Is.EqualTo(101));
         Assert.That(csharp.sphi, Is.EqualTo(111));
         Assert.That(csharp.cphi, Is.EqualTo(121));
         Assert.That(csharp.diurab, Is.EqualTo(131));
-        Assert.That(csharp.era1, Is.EqualTo(141));
+        Assert.That(csharp.eral, Is.EqualTo(141));
         Assert.That(csharp.refa, Is.EqualTo(151));
         Assert.That(csharp.refb, Is.EqualTo(161));
     }

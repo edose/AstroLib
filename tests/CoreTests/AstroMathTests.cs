@@ -15,7 +15,7 @@ namespace AstroLibTests.CoreTests;
 [TestFixture]
 [SuppressMessage("Assertion", "NUnit2045:Use Assert.Multiple")]
 public class AstroMathTests {
-    
+
     // [SetUp]
     // public void Setup() { }
 
@@ -44,9 +44,9 @@ public class AstroMathTests {
         Assert.That(AstroMath.Wrap(360, 0, 360), Is.EqualTo(0));
         Assert.That(AstroMath.Wrap(367, 0, 360), Is.EqualTo(7));
         Assert.That(AstroMath.Wrap(667, 0, 360), Is.EqualTo(667 - 360));
-        Assert.That(AstroMath.Wrap(1.3333, 0.342, 1.866), 
-            Is.EqualTo(1.3333));  // exactness check.
-        
+        Assert.That(AstroMath.Wrap(1.3333, 0.342, 1.866),
+            Is.EqualTo(1.3333)); // exactness check.
+
         Assert.That(AstroMath.Wrap(-455, -180, 180), Is.EqualTo(-455 - (-360)));
         Assert.That(AstroMath.Wrap(-255, -180, 180), Is.EqualTo(-255 - (-360)));
         Assert.That(AstroMath.Wrap(-180.125, -180, 180), Is.EqualTo(-180.125 + 360));
@@ -67,29 +67,29 @@ public class AstroMathTests {
         Assert.That(AstroMath.Clamp(0, -23, 31), Is.EqualTo(0));
         Assert.That(AstroMath.Clamp(31, -23, 31), Is.EqualTo(31));
         Assert.That(AstroMath.Clamp(110, -23, 31), Is.EqualTo(31));
-        Assert.That(AstroMath.Clamp(1.3333, 0.342, 1.866), 
+        Assert.That(AstroMath.Clamp(1.3333, 0.342, 1.866),
             Is.EqualTo(1.3333)); // exactness check
-        
+
         Assert.That(AstroMath.Clamp(-111, null, 31), Is.EqualTo(-111));
         Assert.That(AstroMath.Clamp(-23, null, 31), Is.EqualTo(-23));
         Assert.That(AstroMath.Clamp(0, null, 31), Is.EqualTo(0));
         Assert.That(AstroMath.Clamp(31, null, 31), Is.EqualTo(31));
         Assert.That(AstroMath.Clamp(110, null, 31), Is.EqualTo(31));
-        
+
         Assert.That(AstroMath.Clamp(-111, -23, null), Is.EqualTo(-23));
         Assert.That(AstroMath.Clamp(-23, -23, null), Is.EqualTo(-23));
         Assert.That(AstroMath.Clamp(0, -23, null), Is.EqualTo(0));
         Assert.That(AstroMath.Clamp(31, -23, null), Is.EqualTo(31));
         Assert.That(AstroMath.Clamp(110, -23, null), Is.EqualTo(110));
-        
+
         Assert.That(AstroMath.Clamp(-111, null, null), Is.EqualTo(-111));
         Assert.That(AstroMath.Clamp(-23, null, null), Is.EqualTo(-23));
         Assert.That(AstroMath.Clamp(0, null, null), Is.EqualTo(0));
         Assert.That(AstroMath.Clamp(31, null, null), Is.EqualTo(31));
         Assert.That(AstroMath.Clamp(110, null, null), Is.EqualTo(110));
     }
-    
-    
+
+
     [Test]
     public void IsInRangeTests() {
         Assert.That(AstroMath.IsInRange(-111, -23, 31), Is.False);
@@ -97,19 +97,19 @@ public class AstroMathTests {
         Assert.That(AstroMath.IsInRange(0, -23, 31), Is.True);
         Assert.That(AstroMath.IsInRange(31, -23, 31), Is.True);
         Assert.That(AstroMath.IsInRange(110, -23, 31), Is.False);
-        
+
         Assert.That(AstroMath.IsInRange(-111, null, 31), Is.True);
         Assert.That(AstroMath.IsInRange(-23, null, 31), Is.True);
         Assert.That(AstroMath.IsInRange(0, null, 31), Is.True);
         Assert.That(AstroMath.IsInRange(31, null, 31), Is.True);
         Assert.That(AstroMath.IsInRange(110.0, null, 31), Is.False);
-        
+
         Assert.That(AstroMath.IsInRange(-111, -23, null), Is.False);
         Assert.That(AstroMath.IsInRange(-23, -23, null), Is.True);
         Assert.That(AstroMath.IsInRange(0, -23, null), Is.True);
         Assert.That(AstroMath.IsInRange(31, -23, null), Is.True);
         Assert.That(AstroMath.IsInRange(110, -23, null), Is.True);
-        
+
         Assert.That(AstroMath.IsInRange(-111, null, null), Is.True);
         Assert.That(AstroMath.IsInRange(-23, null, null), Is.True);
         Assert.That(AstroMath.IsInRange(0, null, null), Is.True);
@@ -121,11 +121,32 @@ public class AstroMathTests {
     public void Render1dTo2dArrayTests() {
         var array1d = new double[6] {3, 2, 6, 5, 9, 8};
         var array2d = AstroMath.Reshape1dTo2dArray(array1d, 2, 3);
-        var array2dExpected = new double[,] {{3, 2, 6}, {5, 9, 8} };
+        var array2dExpected = new double[,] {{3, 2, 6}, {5, 9, 8}};
         Assert.That(array2d, Is.EqualTo(array2dExpected));
-        
+
         // Test throwing exception for mismatched sizes:
-        Assert.That(() => AstroMath.Reshape1dTo2dArray(array1d, 2, 2), 
+        Assert.That(() => AstroMath.Reshape1dTo2dArray(array1d, 2, 2),
             Throws.TypeOf<ArgumentException>());
+    }
+
+    [Test]
+    public void TransposeSquareMatrixTests() {
+        var original = new double[3, 3] {{3, 2, 6}, {5, 9, 8}, {12, 11, 13}};
+        var transposed = AstroMath.TransposeSquareMatrix(original);
+        var transposedExpected = new double[3, 3] {{3, 5, 12}, {2, 9, 11}, {6, 8, 13}};
+        Assert.That(transposed, Is.EqualTo(transposedExpected));
+
+        // Test throwing exception for mismatched sizes:
+        var nonSquare = new double[2, 3] {{3, 2, 6}, {5, 9, 8}};
+        Assert.That(() => AstroMath.TransposeSquareMatrix(nonSquare),
+            Throws.TypeOf<ArgumentException>());
+    }
+
+    [Test]
+    public void Flatten2DimArrayTests() {
+        var original = new double[2, 3] {{2, 3, 5}, {7, 22, 1}};
+        var flattened = AstroMath.Flatten2DimArray(original);
+        var flattenedExpected = new double[6] {2, 3, 5, 7, 22, 1};
+        Assert.That(flattened, Is.EqualTo(flattenedExpected));
     }
 }
