@@ -707,6 +707,7 @@ public class SofaAstronomyTests {
     [Test]
     public void Taitt_Tests() {
         var (status, tt1, tt2) = Sofa.Taitt(2453750.5, 0.892482639);
+        Assert.That(status, Is.EqualTo(0));
         Assert.That(tt1, Is.EqualTo(2453750.5).Within(1e-6));
         Assert.That(tt2, Is.EqualTo(0.892855139).Within(1e-12));
     }
@@ -714,6 +715,7 @@ public class SofaAstronomyTests {
     [Test]
     public void Taiut1_Tests() {
         var (status, ut11, ut12) = Sofa.Taiut1(2453750.5, 0.892482639, -32.6659);
+        Assert.That(status, Is.EqualTo(0));
         Assert.That(ut11, Is.EqualTo(2453750.5).Within(1e-6));
         Assert.That(ut12, Is.EqualTo(0.8921045614537037037).Within(1e-12));
     }
@@ -721,6 +723,7 @@ public class SofaAstronomyTests {
     [Test]
     public void Taiutc_Tests() {
         var (status, utc1, utc2) = Sofa.Taiutc(2453750.5, 0.892482639);
+        Assert.That(status, Is.EqualTo(0));
         Assert.That(utc1, Is.EqualTo(2453750.5).Within(1e-6));
         Assert.That(utc2, Is.EqualTo(0.8921006945555555556).Within(1e-12));
     }
@@ -728,50 +731,613 @@ public class SofaAstronomyTests {
     [Test]
     public void Tcbtdb_Tests() {
         var (status, tdb1, tdb2) = Sofa.Tcbtdb(2453750.5, 0.893019599);
+        Assert.That(status, Is.EqualTo(0));
         Assert.That(tdb1, Is.EqualTo(2453750.5).Within(1e-6));
         Assert.That(tdb2, Is.EqualTo(0.8928551362746343397).Within(1e-12));
     }
+
+    [Test]
+    public void Tcgtt_Tests() {
+        var (status, tt1, tt2) = Sofa.Tcgtt(2453750.5, 0.892862531);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tt1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tt2, Is.EqualTo(0.8928551387488816828).Within(1e-12));
+    }
+
+    [Test]
+    public void Tdbtcb_Tests() {
+        var (status, tcb1, tcb2) = Sofa.Tdbtcb(2453750.5, 0.892855137);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tcb1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tcb2, Is.EqualTo(0.8930195997253656716).Within(1e-12));
+    }
+
+    [Test]
+    public void Tdbtt_Tests() {
+        var (status, tt1, tt2) = Sofa.Tdbtt(2453750.5, 0.892855137, -0.000201);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tt1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tt2, Is.EqualTo(0.8928551393263888889).Within(1e-12));
+    }
+
+    [Test]
+    public void Tttai_Tests() {
+        var (status, tai1, tai2) = Sofa.Tttai(2453750.5, 0.892482639);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tai1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tai2, Is.EqualTo(0.892110139).Within(1e-12));
+    }
+
+    [Test]
+    public void Tttcg_Tests() {
+        var (status, tcg1, tcg2) = Sofa.Tttcg(2453750.5, 0.892482639);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tcg1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tcg2, Is.EqualTo(0.8924900312508587113).Within(1e-12));
+    }
+
+    [Test]
+    public void Tttdb_Tests() {
+        var (status, tdb1, tdb2) = Sofa.Tttdb(2453750.5, 0.892855139, -0.000201);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tdb1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tdb2, Is.EqualTo(0.8928551366736111111).Within(1e-12));
+    }
+
+    [Test]
+    public void Ttut1_Tests() {
+        var (status, ut11, ut12) = Sofa.Ttut1(2453750.5, 0.892855139, 64.8499);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(ut11, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(ut12, Is.EqualTo(0.8921045614537037037).Within(1e-12));
+    }
+
+    [Test]
+    public void Ut1tai_Tests() {
+        var (status, tai1, tai2) = Sofa.Ut1tai(2453750.5, 0.892104561, -32.6659);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tai1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tai2, Is.EqualTo(0.8924826385462962963).Within(1e-12));
+    }
+
+    [Test]
+    public void Ut1tt_Tests() {
+        var (status, tt1, tt2) = Sofa.Ut1tt(2453750.5, 0.892104561, 64.8499);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tt1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tt2, Is.EqualTo(0.8928551385462962963).Within(1e-12));
+    }
+
+    [Test]
+    public void Ut1utc_Tests() {
+        var (status, utc1, utc2) = Sofa.Ut1utc(2453750.5, 0.892104561, 0.3341);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(utc1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(utc2, Is.EqualTo(0.8921006941018518519).Within(1e-12));
+    }
+
+    [Test]
+    public void Utctai_Tests() {
+        var (status, tai1, tai2) = Sofa.Utctai(2453750.5, 0.892100694);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(tai1, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(tai2, Is.EqualTo(0.8924826384444444444).Within(1e-12));
+    }
+
+    [Test]
+    public void Utcut1_Tests() {
+        var (status, ut11, ut12) = Sofa.Utcut1(2453750.5, 0.892100694, 0.3341);
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(ut11, Is.EqualTo(2453750.5).Within(1e-6));
+        Assert.That(ut12, Is.EqualTo(0.8921045608981481481).Within(1e-12));
+    }
+
+    #endregion
+    
+    #region "Astronomy: Ecliptic Coordinates"
+    /*######### Astronomy: Ecliptic Coordinates ##########################################################*/
+
+    [Test]
+    public void Eceq06_Tests() {
+        double date1, date2, dl, db;
+        date1 = 2456165.5;
+        date2 = 0.401182685;
+        dl = 5.1;
+        db = -0.9;
+        var (dr, dd) = Sofa.Eceq06(date1, date2, dl, db);
+        Assert.That(dr, Is.EqualTo(5.533459733613627767).Within(1e-14));
+        Assert.That(dd, Is.EqualTo(-1.246542932554480576).Within(1e-14));
+    }
+
+    [Test]
+    public void Ecm06_Tests() {
+        double date1, date2;
+        date1 = 2456165.5;
+        date2 = 0.401182685;
+        var rm = Sofa.Ecm06(date1, date2);
+        var rmExpected = 
+            new double[,] {{0.9999952427708701137, -0.2829062057663042347e-2, -0.1229163741100017629e-2},
+                           {0.3084546876908653562e-2, 0.9174891871550392514, 0.3977487611849338124},
+                           {0.2488512951527405928e-5, -0.3977506604161195467, 0.9174935488232863071}};
+        Assert.That(rm, Is.EqualTo(rmExpected).Within(1e-14));
+    }
+
+    [Test]
+    public void Eqec06_Tests() {
+        double date1, date2, dr, dd;
+        date1 = 1234.5;
+        date2 = 2440000.5;
+        dr = 1.234;
+        dd = 0.987;
+        var (dl, db) = Sofa.Eqec06(date1, date2, dr, dd);
+        Assert.That(dl, Is.EqualTo(1.342509918994654619).Within(1e-14));
+        Assert.That(db, Is.EqualTo(0.5926215259704608132).Within(1e-14));
+    }
+
+    #endregion
+    
+    #region "Astronomy: Earth Rotation and Sidereal Time"
+    /*######### Astronomy: Earth Rotation and Sidereal Time ##############################################*/
+
+    [Test]
+    public void Era00_Tests() {
+        var era = Sofa.Era00(2400000.5, 54388.0);
+        Assert.That(era, Is.EqualTo(0.4022837240028158102).Within(1e-12));
+    }
+
+    [Test]
+    public void Gmst06_Tests() {
+        var gmst = Sofa.Gmst06(2400000.5, 53736.0, 2400000.5, 53736.0);
+        Assert.That(gmst, Is.EqualTo(1.754174971870091203).Within(1e-12));
+    }
+
+    [Test]
+    public void Gst06a_Tests() {
+        var gast = Sofa.Gst06a(2400000.5, 53736.0, 2400000.5, 53736.0);
+        Assert.That(gast, Is.EqualTo(1.754166137675019159).Within(1e-12));
+    }
+    
+    #endregion
+    
+    #region "Astronomy: Ephemerides"
+    /*######### Astronomy: Ephemerides ###################################################################*/
+
+    [Test]
+    public void Epv00_Tests() {
+        var (status, pvh, pvb) = Sofa.Epv00(2400000.5, 53411.52501161);
+        Assert.That(status, Is.EqualTo(0));
         
+        Assert.That(pvh.GetLength(0), Is.EqualTo(2));
+        Assert.That(pvh.GetLength(1), Is.EqualTo(3));
+        Assert.That(pvh[0,0], Is.EqualTo(-0.7757238809297706813).Within(1e-14));
+        Assert.That(pvh[0,1], Is.EqualTo(0.5598052241363340596).Within(1e-14));
+        Assert.That(pvh[0,2], Is.EqualTo(0.2426998466481686993).Within(1e-14));
+        Assert.That(pvh[1,0], Is.EqualTo(-0.1091891824147313846e-1).Within(1e-15));
+        Assert.That(pvh[1,1], Is.EqualTo(-0.1247187268440845008e-1).Within(1e-15));
+        Assert.That(pvh[1,2], Is.EqualTo(-0.5407569418065039061e-2).Within(1e-15));
+        
+        Assert.That(pvb.GetLength(0), Is.EqualTo(2));
+        Assert.That(pvb.GetLength(1), Is.EqualTo(3));
+        Assert.That(pvb[0,0], Is.EqualTo(-0.7714104440491111971).Within(1e-14));
+        Assert.That(pvb[0,1], Is.EqualTo(0.5598412061824171323).Within(1e-14));
+        Assert.That(pvb[0,2], Is.EqualTo(0.2425996277722452400).Within(1e-14));
+        Assert.That(pvb[1,0], Is.EqualTo(-0.1091874268116823295e-1).Within(1e-15));
+        Assert.That(pvb[1,1], Is.EqualTo(-0.1246525461732861538e-1).Within(1e-15));
+        Assert.That(pvb[1,2], Is.EqualTo(-0.5404773180966231279e-2).Within(1e-15));
+    }
+
+    [Test]
+    public void Moon98_Tests() {
+        var pv = Sofa.Moon98(2400000.5, 43999.9);
+        var pvExpected = 
+            new double[,] {{-0.2601295959971044180e-2, 0.6139750944302742189e-3, 0.2640794528229828909e-3},
+                {-0.1244321506649895021e-3, -0.5219076942678119398e-3, -0.1716132214378462047e-3}};
+        Assert.That(pv, Is.EqualTo(pvExpected).Within(1e-11));
+    }
+
+    [Test]
+    public void Plan94_Tests() {
+        // Test illegal planet number np=0:
+        var (status, pv) = Sofa.Plan94(2400000.5, 1e6, 0);
+        Assert.That(status, Is.EqualTo(-1));
+        var pvExpected = new double[,] {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+        Assert.That(pv, Is.EqualTo(pvExpected));
+        
+        // Test illegal planet number np=10:
+        (status, pv) = Sofa.Plan94(2400000.5, 1e6, 10);
+        Assert.That(status, Is.EqualTo(-1));
+        
+        // Test year outside range:
+        (status, pv) = Sofa.Plan94(2400000.5, -320000, 3);
+        Assert.That(status, Is.EqualTo(1));
+        pvExpected = new double[,] {{0.9308038666832975759, 0.3258319040261346000, 0.1422794544481140560}, 
+            {-0.6429458958255170006e-2, 0.1468570657704237764e-1, 0.6406996426270981189e-2}};
+        Assert.That(pv, Is.EqualTo(pvExpected).Within(1e-11));
+        
+        // Test normal case:
+        (status, pv) = Sofa.Plan94(2400000.5, 43999.9, 1);
+        Assert.That(status, Is.EqualTo(0));
+        pvExpected = new double[,] {{0.2945293959257430832, -0.2452204176601049596, -0.1615427700571978153},
+            {0.1413867871404614441e-1, 0.1946548301104706582e-1, 0.8929809783898904786e-2}};
+        Assert.That(pv, Is.EqualTo(pvExpected).Within(1e-11));
+    }
+
+    #endregion
+    
+    
+    #region "Astronomy: Fundamental Arguments"
+    /*######### Astronomy: Fundamental Arguments #########################################################*/
+    // No implemented functions to test.
+    #endregion
+    
+
+    #region "Astronomy: Galactic Coordinates"
+    /*######### Astronomy: Galactic Coordinates ##########################################################*/
+
+    [Test]
+    public void G2icrs_Tests() {
+        double dl, db;
+        dl =  5.5850536063818546461558105;
+        db = -0.7853981633974483096156608;
+        var (dr, dd) = Sofa.G2icrs(dl, db);
+        Assert.That(dr, Is.EqualTo(5.9338074302227188048671).Within(1e-14));
+        Assert.That(dd, Is.EqualTo(-1.1784870613579944551541).Within(1e-14));
+    }
+
+    [Test]
+    public void Icrs2g_Tests() {
+        double dr, dd;
+        dr =  5.9338074302227188048671087;
+        dd = -1.1784870613579944551540570;
+        var (dl, db) = Sofa.Icrs2g(dr, dd);
+        Assert.That(dl, Is.EqualTo(5.5850536063818546461558).Within(1e-14));
+        Assert.That(db, Is.EqualTo(-0.7853981633974483096157).Within(1e-14));
+    }
+    
+    #endregion
+    
+    #region "Astronomy: Geocentric/Geodetic Transformations"
+    /*######### Astronomy: Geocentric/Geodetic Transformations ###########################################*/
+
+    [Test]
+    public void Gc2gd_Tests() {
+        var xyz = new double[] {2e6, 3e6, 5.244e6};
+        
+        // Test illegal ellipsoid identifier n=0:
+        var (status, elong, phi, height) = Sofa.Gc2gd(0, xyz);
+        Assert.That(status, Is.EqualTo(-1));
+        
+        // Test normal case, WGS84:
+        (status, elong, phi, height) = Sofa.Gc2gd(1, xyz); // n=1 signifies WGS84.
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(elong,  Is.EqualTo(0.9827937232473290680).Within(1e-14));
+        Assert.That(phi,    Is.EqualTo(0.97160184819075459).Within(1e-14));
+        Assert.That(height, Is.EqualTo(331.4172461426059892).Within(1e-8));
+
+        // Test normal case, GRS80 ellipsoid:
+        (status, elong, phi, height) = Sofa.Gc2gd(2, xyz); // n=2 signifies GRS80.
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(elong,  Is.EqualTo(0.9827937232473290680).Within(1e-14));
+        Assert.That(phi,    Is.EqualTo(0.97160184820607853).Within(1e-14));
+        Assert.That(height, Is.EqualTo(331.41731754844348).Within(1e-8));
+        
+        // Test normal case, WGS72 ellipsoid:
+        (status, elong, phi, height) = Sofa.Gc2gd(3, xyz); // n=3 signifies WGS72.
+        Assert.That(status, Is.EqualTo(0));
+        Assert.That(elong,  Is.EqualTo(0.9827937232473290680).Within(1e-14));
+        Assert.That(phi,    Is.EqualTo(0.9716018181101511937).Within(1e-14));
+        Assert.That(height, Is.EqualTo(333.2770726130318123).Within(1e-8));
+        
+        // Test illegal ellipsoid identifier:
+        (status, elong, phi, height) = Sofa.Gc2gd(4, xyz); // n not in range 1-3.
+        Assert.That(status, Is.EqualTo(-1));
+    }
+
+    [Test]
+    public void Gd2gc_Tests() {
+        double elong = 3.1, phi = -0.5, height = 2500.0;
+        
+        // Test illegal ellipsoid identifier n=0:
+        var (status, xyz) = Sofa.Gd2gc(0, elong, phi, height);
+        Assert.That(status, Is.EqualTo(-1));
+        
+        // Test normal case, WGS84:
+        (status, xyz) = Sofa.Gd2gc(1, elong, phi, height);
+        Assert.That(status, Is.EqualTo(0));
+        var xyzExpected = new double[] {-5599000.5577049947, 233011.67223479203, -3040909.4706983363};
+        Assert.That(xyz,  Is.EqualTo(xyzExpected).Within(1e-7));
+        
+        // Test normal case, GRS80:
+        (status, xyz) = Sofa.Gd2gc(2, elong, phi, height);
+        Assert.That(status, Is.EqualTo(0));
+        xyzExpected = new double[] {-5599000.5577260984, 233011.6722356702949, -3040909.4706095476};
+        Assert.That(xyz,  Is.EqualTo(xyzExpected).Within(1e-7));
+        
+        // Test normal case, WGS72:
+        (status, xyz) = Sofa.Gd2gc(3, elong, phi, height);
+        Assert.That(status, Is.EqualTo(0));
+        xyzExpected = new double[] {-5598998.7626301490, 233011.5975297822211, -3040908.6861467111};
+        Assert.That(xyz,  Is.EqualTo(xyzExpected).Within(1e-7));
+        
+        // Test illegal ellipsoid identifier n=4:
+        (status, xyz) = Sofa.Gd2gc(4, elong, phi, height);
+        Assert.That(status, Is.EqualTo(-1));
+    }
+
+    #endregion
+    
+    #region "Astronomy: Gnomonic Projections"
+    /*######### Astronomy: Gnomonic Projections ##########################################################*/
+
+    [Test]
+    public void Tpsts_Tests() {
+        double xi, eta, raz, decz;
+        xi = -0.03;
+        eta = 0.07;
+        raz = 2.3;
+        decz = 1.5;
+        var (ra, dec) = Sofa.Tpsts(xi, eta, raz, decz);
+        Assert.That(ra,  Is.EqualTo(0.7596127167359629775).Within(1e-14));
+        Assert.That(dec, Is.EqualTo(1.540864645109263028).Within(1e-13));
+    }
+
+    [Test]
+    public void Tpstv_Tests() {
+        double xi, eta, raz, decz;
+        xi = -0.03;
+        eta = 0.07;
+        raz = 2.3;
+        decz = 1.5;
+        var vz = Sofa.S2c(raz, decz);
+        var v = Sofa.Tpstv(xi, eta, vz);
+        Assert.That(v.GetLength(0), Is.EqualTo(3));
+        Assert.That(v[0],  Is.EqualTo(0.02170030454907376677).Within(1e-15));
+        Assert.That(v[1],  Is.EqualTo(0.02060909590535367447).Within(1e-15));
+        Assert.That(v[2],  Is.EqualTo(0.9995520806583523804).Within(1e-14)); 
+    }
+
+    [Test]
+    public void Tpxes_Tests() {
+        double ra, dec, raz, decz;
+        ra = 1.3;
+        dec = 1.55;
+        raz = 2.3;
+        decz = 1.5;
+        var (status, xi, eta) = Sofa.Tpxes(ra, dec, raz, decz);
+        Assert.That(status,  Is.EqualTo(0));
+        Assert.That(xi,  Is.EqualTo(-0.01753200983236980595).Within(1e-15));
+        Assert.That(eta, Is.EqualTo(0.05962940005778712891).Within(1e-15));
+    }
+
+    [Test]
+    public void Tpxev_Tests() {
+        double ra, dec, raz, decz;
+        ra = 1.3;
+        dec = 1.55;
+        raz = 2.3;
+        decz = 1.5;
+        var v  = Sofa.S2c(ra, dec);
+        var vz = Sofa.S2c(raz, decz);
+        var (status, xi, eta) = Sofa.Tpxev(v, vz);
+        Assert.That(status,  Is.EqualTo(0));
+        Assert.That(xi,  Is.EqualTo(-0.01753200983236980595).Within(1e-15));
+        Assert.That(eta, Is.EqualTo(0.05962940005778712891).Within(1e-15));
+    }
+
+    #endregion
+    
+    #region "Astronomy: Horizon/Equatorial Coordinates"
+    /*######### Astronomy: Horizon/Equatorial Coordinates ################################################*/
+
+    [Test]
+    public void Ae2hd_Tests() {
+        double az, el, phi;
+        az = 5.5;
+        el = 1.1;
+        phi = 0.7;
+        var (ha, dec) = Sofa.Ae2hd(az, el, phi);
+        Assert.That(ha,  Is.EqualTo(0.5933291115507309663).Within(1e-14));
+        Assert.That(dec, Is.EqualTo(0.9613934761647817620).Within(1e-14));
+    }
+
+    [Test]
+    public void Hd2ae_Tests() {
+        double ha, dec, phi;
+        ha = 1.1;
+        dec = 1.2;
+        phi = 0.3;
+        var (az, el) = Sofa.Hd2ae(ha, dec, phi);
+        Assert.That(az, Is.EqualTo(5.916889243730066194).Within(1e-13));
+        Assert.That(el, Is.EqualTo(0.4472186304990486228).Within(1e-14));
+    }
+    
+    #endregion
+    
+    #region "Astronomy: Precession/Nutation/Polar Motion"
+    /*######### Astronomy: Precession/Nutation/Polar Motion ##############################################*/
+
+    [Test]
+    public void S06a_Tests() {
+        var s = Sofa.S06a(2400000.5, 52541.0);
+        Assert.That(s, Is.EqualTo(-0.1340680437291812383e-7).Within(1e-18));
+    }
+
+    [Test]
+    public void Xy06_Tests() {
+        var (x, y) = Sofa.Xy06(2400000.5, 53736.0);
+        Assert.That(x, Is.EqualTo(0.5791308486706010975e-3).Within(1e-15));
+        Assert.That(y, Is.EqualTo(0.4020579816732958141e-4).Within(1e-16));
+    }
+
+    [Test]
+    public void Xys06a_Tests() {
+        var (x, y, s) = Sofa.Xys06a(2400000.5, 53736.0);
+        Assert.That(x, Is.EqualTo(0.5791308482835292617e-3).Within(1e-14));
+        Assert.That(y, Is.EqualTo(0.4020580099454020310e-4).Within(1e-15));
+        Assert.That(s, Is.EqualTo(-0.1220032294164579896e-7).Within(1e-18));
+    }
+    
+    #endregion
+    
+    #region "Astronomy: Star Catalog Conversions"
+    /*######### Astronomy: Star Catalog Conversions ######################################################*/
+    
+    // No functions in this region were implemented.
+    
+    #endregion
+    
+    #region "Vector/Matrix: Initialization"
+    /*######### Vector/Matrix: Initialization ############################################################*/
+    
+    // No functions in this region were implemented.
+    
+    #endregion
+    
+    #region "Vector/Matrix: Copy/Extend/Extract"
+    /*######### Vector/Matrix: Copy/Extend/Extract #######################################################*/
+        
+    // No functions in this region were implemented.
+    
+    #endregion
+    
+    #region "Vector/Matrix: Build Rotations"
+    /*######### Vector/Matrix: Build Rotations ###########################################################*/
+
+    [Test]
+    public void Rx_Tests() {
+        double phi = 0.3456789;
+        var r = new double[,] {{2, 3, 2}, {3, 2, 3}, {3, 4, 5}};
+        var rotated = Sofa.Rx(phi, r);
+        Assert.That(rotated[0,0], Is.EqualTo(2.0));
+        Assert.That(rotated[0,1], Is.EqualTo(3.0));
+        Assert.That(rotated[0,2], Is.EqualTo(2.0));
+        Assert.That(rotated[1,0], Is.EqualTo(3.839043388235612460).Within(1e-12));
+        Assert.That(rotated[1,1], Is.EqualTo(3.237033249594111899).Within(1e-12));
+        Assert.That(rotated[1,2], Is.EqualTo(4.516714379005982719).Within(1e-12));
+        Assert.That(rotated[2,0], Is.EqualTo(1.806030415924501684).Within(1e-12));
+        Assert.That(rotated[2,1], Is.EqualTo(3.085711545336372503).Within(1e-12));
+        Assert.That(rotated[2,2], Is.EqualTo(3.687721683977873065).Within(1e-12));
+    }
+
+    [Test]
+    public void Ry_Tests() {
+        double theta = 0.3456789;
+        var r = new double[,] {{2, 3, 2}, {3, 2, 3}, {3, 4, 5}};
+        var rotated = Sofa.Ry(theta, r);
+        Assert.That(rotated[0,0], Is.EqualTo(0.8651847818978159930).Within(1e-12));
+        Assert.That(rotated[0,1], Is.EqualTo(1.467194920539316554).Within(1e-12));
+        Assert.That(rotated[0,2], Is.EqualTo(0.1875137911274457342).Within(1e-12));
+        Assert.That(rotated[1,0], Is.EqualTo(3.0));
+        Assert.That(rotated[1,1], Is.EqualTo(2.0));
+        Assert.That(rotated[1,2], Is.EqualTo(3.0));
+        Assert.That(rotated[2,0], Is.EqualTo(3.500207892850427330).Within(1e-12));
+        Assert.That(rotated[2,1], Is.EqualTo(4.779889022262298150).Within(1e-12));
+        Assert.That(rotated[2,2], Is.EqualTo(5.381899160903798712).Within(1e-12));
+    }
+
+    [Test]
+    public void Rz_Tests() {
+        double psi = 0.3456789;
+        var r = new double[,] {{2, 3, 2}, {3, 2, 3}, {3, 4, 5}};
+        var rotated = Sofa.Rz(psi, r);
+        Assert.That(rotated[0,0], Is.EqualTo(2.898197754208926769).Within(1e-12));
+        Assert.That(rotated[0,1], Is.EqualTo(3.500207892850427330).Within(1e-12));
+        Assert.That(rotated[0,2], Is.EqualTo(2.898197754208926769).Within(1e-12));
+        Assert.That(rotated[1,0], Is.EqualTo(2.144865911309686813).Within(1e-12));
+        Assert.That(rotated[1,1], Is.EqualTo(0.865184781897815993).Within(1e-12));
+        Assert.That(rotated[1,2], Is.EqualTo(2.144865911309686813).Within(1e-12));
+        Assert.That(rotated[2,0], Is.EqualTo(3.0));
+        Assert.That(rotated[2,1], Is.EqualTo(4.0));
+        Assert.That(rotated[2,2], Is.EqualTo(5.0));
+    }
+
+    #endregion
+
+    #region "Vector/Matrix: Spherical/Cartesian Conversions"
+    /*######### Vector/Matrix: Spherical/Cartesian Conversions ###########################################*/
+
+    [Test]
+    public void S2c_Tests() {
+        var c = Sofa.S2c(3.0123, -0.999);
+        var cExpected = new double[] 
+            {-0.5366267667260523906, 0.0697711109765145365, -0.8409302618566214041};
+        Assert.That(c, Is.EqualTo(cExpected).Within(1e-12));
+    }
+
+    [Test]
+    public void C2s_Tests() {
+        var p = new double[] {100, -50, 25};
+        var (theta, phi) = Sofa.C2s(p);
+        Assert.That(theta, Is.EqualTo(-0.4636476090008061162).Within(1e-14));
+        Assert.That(phi,   Is.EqualTo(0.2199879773954594463).Within(1e-14));
+    }
+
+    [Test]
+    public void S2p_Tests() {
+        var p = Sofa.S2p(-3.21, 0.123, 0.456);
+        var pExpected = new double[] 
+            {-0.4514964673880165228, 0.0309339427734258688, 0.0559466810510877933};
+        Assert.That(p, Is.EqualTo(pExpected).Within(1e-12));
+    }
+
+    [Test]
+    public void P2s_Tests() {
+        var p = new double[] {100, -50, 25};
+        var (theta, phi, r) = Sofa.P2s(p);
+        Assert.That(theta, Is.EqualTo(-0.4636476090008061162).Within(1e-12));
+        Assert.That(phi,   Is.EqualTo(0.2199879773954594463).Within(1e-12));
+        Assert.That(r,     Is.EqualTo(114.5643923738960002).Within(1e-9));
+    }
+
+    [Test]
+    public void S2pv_Tests() {
+        var pv = Sofa.S2pv(-3.21, 0.123, 0.456, -7.8e-6, 9.01e-6, -1.23e-5);
+        Assert.That(pv.GetLength(0), Is.EqualTo(2));
+        Assert.That(pv.GetLength(1), Is.EqualTo(3));
+        Assert.That(pv[0,0], Is.EqualTo(-0.4514964673880165228).Within(1e-12));
+        Assert.That(pv[0,1], Is.EqualTo(0.0309339427734258688).Within(1e-12));
+        Assert.That(pv[0,2], Is.EqualTo(0.0559466810510877933).Within(1e-12));
+        Assert.That(pv[1,0], Is.EqualTo(0.1292270850663260170e-4).Within(1e-16));
+        Assert.That(pv[1,1], Is.EqualTo(0.2652814182060691422e-5).Within(1e-16));
+        Assert.That(pv[1,2], Is.EqualTo(0.2568431853930292259e-5).Within(1e-16));
+    }
+
+    [Test]
+    public void Pv2s_Tests() {
+        var pv = new double[,] {{-0.4514964673880165, 0.03093394277342585, 0.05594668105108779},
+            {1.292270850663260e-5, 2.652814182060692e-6, 2.568431853930293e-6}};
+        var (theta, phi, r, td, pd, rd) = Sofa.Pv2s(pv);
+        Assert.That(theta, Is.EqualTo(3.073185307179586515).Within(1e-12));
+        Assert.That(phi,   Is.EqualTo(0.1229999999999999992).Within(1e-12));
+        Assert.That(r,     Is.EqualTo(0.4559999999999999757).Within(1e-12));
+        Assert.That(td,    Is.EqualTo(-0.7800000000000000364e-5).Within(1e-16));
+        Assert.That(pd,    Is.EqualTo(0.9010000000000001639e-5).Within(1e-16));
+        Assert.That(rd,    Is.EqualTo(-0.1229999999999999832e-4).Within(1e-16));
+    }
+
+    #endregion
+    
+    #region "Vector/Matrix: Operations on Vectors"
+    /*######### Vector/Matrix: Operations on Vectors #####################################################*/
+    
+    // No functions in this region were implemented.
+    
+    #endregion
+    
+    #region "Vector/Matrix: Operations on Matrices"
+    /*######### Vector/Matrix: Operations on Matrices ####################################################*/
+
     // TODO: Resume here...
     
     [Test]
-    public void Tcgtt_Tests() { }
-        
+    public void Rxr_Tests() { }
+
     [Test]
-    public void Tdbtcb_Tests() { }
-        
-    [Test]
-    public void Tdbtt_Tests() { }
-        
-    [Test]
-    public void Tttai_Tests() { }
-        
-    [Test]
-    public void Tttcg_Tests() { }
-            
-    [Test]
-    public void Tttdb_Tests() { }
-            
-    [Test]
-    public void Ttut1_Tests() { }
-            
-    [Test]
-    public void Ut1tai_Tests() { }
-            
-    [Test]
-    public void Ut1tt_Tests() { }
-            
-    [Test]
-    public void Ut1utc_Tests() { }
-            
-    [Test]
-    public void Utctai_Tests() { }
-            
-    [Test]
-    public void Utcut1_Tests() { }
+    public void Tr_Tests() { }
     
     
     #endregion
     
-
+    
+    
 }

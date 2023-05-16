@@ -1346,8 +1346,12 @@ public static partial class Sofa {
     /// <param name="date2">Part 2 of quasi-Julian form of TDB (or possibly TT) date</param>
     /// <param name="np">planet (1=Mercury, 2=Venus, 3=EMB (Earth-Moon Barycenter; for earth alone use
     /// Epv00), 4=Mars, 5=Jupiter, 6=Saturn, 7=Uranus, 8=Neptune)</param>
-    /// <returns> pv [double[2][3]]: Planet position and velocity,
-    /// heliocentric J2000.0 (in AU, AU/d)</returns>.
+    /// <returns>2-tuple: status [int]: -1 -> error: illegal planet number np (must be 1-8)
+    ///                                  0 -> OK
+    ///                                 +1 -> warning: year outside 1000-3000
+    ///                                 +2 -> warning: failed to converge
+    ///                   pv [double[2][3]]: Planet position and velocity,
+    ///                                 heliocentric J2000.0 (in AU, AU/d)</returns>.
     public static Tuple<int, double[,]> Plan94(double date1, double date2, int np) {
         var pv = new double[2, 3] {{0, 0, 0}, {0, 0, 0}};
         var status = S_Plan94(date1, date2, np, pv);
@@ -1473,10 +1477,10 @@ public static partial class Sofa {
     /// <returns>Star's unit vector (direction cosines)</returns>
     public static double[] Tpstv(double xi, double eta, double[] v0) {
         var v  = new double[3] {0, 0, 0};
-        S_Tpstv(xi, eta, v0, ref v);
+        S_Tpstv(xi, eta, v0, v);
         return v; }
     [DllImport(DllFilename, EntryPoint = "iauTpstv", CallingConvention = CallingConvention.Cdecl)]
-    static extern void S_Tpstv (double xi, double eta, double[] v0, ref double[] v);
+    static extern void S_Tpstv (double xi, double eta, double[] v0, [In, Out] double[] v);
 
 
     /// <summary>Sofa.Tpxes(): Project a star's celestial spherical coordinates to find its rectangular
