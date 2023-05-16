@@ -1979,12 +1979,13 @@ public static partial class Sofa {
     ///     idmsf (int array of length 4):
     ///         degrees, arcminutes, arcseconds, fraction in the requested resolution.</returns>
     public static Tuple<string, int[]> A2af(int ndp, double angle) {
-        string sign = " ";
+        char[] signChar = {'X'};
         var idmsf = new int[4] {0, 0, 0, 0};
-        S_A2af(ndp, angle, sign, idmsf);
-        return Tuple.Create(sign, idmsf); }
+        S_A2af(ndp, angle, signChar, idmsf);
+        string signString = new string(signChar);
+        return Tuple.Create(signString, idmsf); }
     [DllImport(DllFilename, EntryPoint = "iauA2af", CallingConvention = CallingConvention.Cdecl)]
-    static extern void S_A2af(int ndp, double angle, string sign, [In, Out] int[] idmsf);
+    static extern void S_A2af(int ndp, double angle, [In, Out] char[] signChar, [In, Out] int[] idmsf);
 
     
     /// <summary> Sofa.A2tf(): Decompose radians into hours, minutes, seconds, fraction.</summary>
@@ -1997,30 +1998,32 @@ public static partial class Sofa {
     ///     ihmsf (int array of length 4):
     ///         hours, minutes, seconds, fraction in the requested resolution.</returns>
     public static Tuple<string, int[]> A2tf(int ndp, double angle) {
-        string sign = " ";
+        char[] signChar = {'X'};
         var ihmsf = new int[4] {0, 0, 0, 0};
-        S_A2tf(ndp, angle, sign, ihmsf);
-        return Tuple.Create(sign, ihmsf); }
+        S_A2tf(ndp, angle, signChar, ihmsf);
+        string signString = new string(signChar);
+        return Tuple.Create(signString, ihmsf); }
     [DllImport(DllFilename, EntryPoint = "iauA2tf", CallingConvention = CallingConvention.Cdecl)]
-    static extern void S_A2tf(int ndp, double angle, string sign, [In, Out] int[] ihmsf);
+    static extern void S_A2tf(int ndp, double angle, [In, Out] char[] signChar, [In, Out] int[] ihmsf);
 
     
     /// <summary> Sofa.Af2a(): Convert degrees, arcminutes, arcseconds to radians.</summary>
-    /// <param name="s">Sign (char), '-' means negative, any other means positive.</param>
-    /// <param name="ideg">Degrees (int)</param>
-    /// <param name="iamin">Arcminutes (int)</param>
-    /// <param name="asec">Arcseconds (double)</param>
+    /// <param name="s">Sign [string], '-' means negative, any other means positive.</param>
+    /// <param name="ideg">Degrees [int]</param>
+    /// <param name="iamin">Arcminutes [int]</param>
+    /// <param name="asec">Arcseconds [double]</param>
     /// <returns> 2-Tuple: status [int]: 0 -> OK
     ///                                  1 -> ideg outside [0-359] (degrees)
     ///                                  2 -> iamin outside [0-59] (minutes)
     ///                                  3 -> asec outside [0, 60) (arcseconds)
     ///                    rad: Angle (radians)</returns>
     public static Tuple<int, double> Af2a(string s, int ideg, int iamin, double asec) {
-        double rad = 0; 
-        var status = S_Af2a(s, ideg, iamin, asec, ref rad);
+        double rad = 0;
+        char sChar = s[0];
+        var status = S_Af2a(sChar, ideg, iamin, asec, ref rad);
         return Tuple.Create(status, rad); }
     [DllImport(DllFilename, EntryPoint = "iauAf2a", CallingConvention = CallingConvention.Cdecl)]
-    static extern int S_Af2a(string s, int ideg, int iamin, double asec, ref double rad);
+    static extern int S_Af2a(char sChar, int ideg, int iamin, double asec, ref double rad);
 
     // Anp():   NOT IMPLEMENTED. Prefer AstroLib.Core.AstroMath.Wrap().
     // Anpm():  NOT IMPLEMENTED. Prefer AstroLib.Core.AstroMath.Wrap().
@@ -2034,16 +2037,17 @@ public static partial class Sofa {
     ///     ihmsf (int array of length 4):
     ///         hours, minutes, seconds, fraction in the requested resolution.</returns>
     public static Tuple<string, int[]> D2tf(int ndp, double days) {
-        string sign = " ";
+        char[] signChar = {'X'};
         var ihmsf = new int[4] {0, 0, 0, 0};
-        S_D2tf(ndp, days, sign, ihmsf);
-        return Tuple.Create(sign, ihmsf); }
+        S_D2tf(ndp, days, signChar, ihmsf);
+        string signString = new string(signChar);
+        return Tuple.Create(signString, ihmsf); }
     [DllImport(DllFilename, EntryPoint = "iauD2tf", CallingConvention = CallingConvention.Cdecl)]
-    static extern void S_D2tf(int ndp, double days, string sign, [In, Out] int[] ihmsf);
+    static extern void S_D2tf(int ndp, double days, [In, Out] char[] signChar, [In, Out] int[] ihmsf);
     
 
     /// <summary> Sofa.Tf2a(): Convert hours, minutes, seconds to angle in radians.</summary>
-    /// <param name="s">Sign (char), '-' means negative, any other means positive.</param>
+    /// <param name="s">Sign [string], '-' means negative, any other means positive.</param>
     /// <param name="ihour">Hours (int)</param>
     /// <param name="imin">Minutes (int)</param>
     /// <param name="sec">Seconds (double)</param>
@@ -2052,26 +2056,28 @@ public static partial class Sofa {
     ///                                  2 -> iamin outside [0-59] (minutes)
     ///                                  3 -> asec outside [0, 60) (arcseconds)
     ///                    rad: Angle (radians)</returns>
-    public static Tuple<int, double> Tf2a(char s, int ihour, int imin, double sec) {
+    public static Tuple<int, double> Tf2a(string s, int ihour, int imin, double sec) {
         double rad = 0;
-        var status = S_Tf2a(s, ihour, imin, sec, ref rad);
+        char ch = s[0];
+        var status = S_Tf2a(ch, ihour, imin, sec, ref rad);
         return Tuple.Create(status, rad); }
     [DllImport(DllFilename, EntryPoint = "iauTf2a", CallingConvention = CallingConvention.Cdecl)]
-    static extern int S_Tf2a(char s, int ihour, int imin, double sec, ref double rad);
+    static extern int S_Tf2a(char ch, int ihour, int imin, double sec, ref double rad);
 
 
     /// <summary> Sofa.Tf2d(): Convert hours, minutes, seconds to days. </summary>
-    /// <param name="s">Sign (char), '-' means negative, any other means positive.</param>
+    /// <param name="s">Sign string, length 1], '-' means negative, any other means positive.</param>
     /// <param name="ihour">Hours (int)</param>
     /// <param name="imin">Minutes (int)</param>
     /// <param name="sec">Seconds (double)</param>
     /// <returns>Days (double)</returns>
-    public static Tuple<int, double> Tf2d(char s, int ihour, int imin, double sec) {
+    public static Tuple<int, double> Tf2d(string s, int ihour, int imin, double sec) {
+        char ch = s[0];
         double days = 0;
-        var status = S_Tf2d(s, ihour, imin, sec, ref days);
+        var status = S_Tf2d(ch, ihour, imin, sec, ref days);
         return Tuple.Create(status, days); }
     [DllImport(DllFilename, EntryPoint = "iauTf2d", CallingConvention = CallingConvention.Cdecl)]
-    static extern int S_Tf2d(char s, int ihour, int imin, double sec, ref double days);
+    static extern int S_Tf2d(char ch, int ihour, int imin, double sec, ref double days);
 
     #endregion  //  Operations on Angles.
     
